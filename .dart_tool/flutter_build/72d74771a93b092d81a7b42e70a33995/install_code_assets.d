@@ -1,0 +1,1 @@
+ /Users/macbook/Downloads/frontend_aBit\ 4/job_portal_ui/.dart_tool/flutter_build/72d74771a93b092d81a7b42e70a33995/native_assets.json: 
