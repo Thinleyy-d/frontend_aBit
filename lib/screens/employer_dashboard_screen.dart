@@ -22,14 +22,14 @@ class EmployerDashboardScreen extends StatelessWidget {
                 children: [
                   Container(
                     decoration: BoxDecoration(
-                      color: Color(0xFF4C7DFF),
+                      color: const Color(0xFF4C7DFF),
                       borderRadius: BorderRadius.circular(16),
                     ),
-                    padding: EdgeInsets.all(8),
-                    child: Icon(Icons.search, color: Colors.white),
+                    padding: const EdgeInsets.all(8),
+                    child: const Icon(Icons.search, color: Colors.white),
                   ),
-                  SizedBox(width: 18),
-                  Expanded(
+                  const SizedBox(width: 18),
+                  const Expanded(
                     child: Text(
                       'Welcome, AirBNB !',
                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
@@ -37,38 +37,57 @@ class EmployerDashboardScreen extends StatelessWidget {
                   ),
                   Column(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFEDF2FF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(10),
-                        child: Icon(Icons.notifications, color: Color(0xFF4C7DFF)),
+                      Row(
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEDF2FF),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            child: const Icon(Icons.notifications, color: Color(0xFF4C7DFF)),
+                          ),
+                          const SizedBox(width: 10),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).pushNamed('/organization_profile_form');
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFEDF2FF),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              padding: const EdgeInsets.all(10),
+                              child: const Icon(Icons.business, color: Color(0xFF4C7DFF)),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEDF2FF),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            padding: const EdgeInsets.all(10),
+                            child: const Icon(Icons.filter_alt_outlined, color: Color(0xFF4C7DFF)),
+                          ),
+                        ],
                       ),
-                      SizedBox(height: 10),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Color(0xFFEDF2FF),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        padding: EdgeInsets.all(10),
-                        child: Icon(Icons.filter_alt_outlined, color: Color(0xFF4C7DFF)),
-                      ),
+                      const SizedBox(height: 10),
                     ],
                   )
                 ],
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               // Search
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFFF9FAFF),
+                  color: const Color(0xFFF9FAFF),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: TextField(
                         decoration: InputDecoration(
                           border: InputBorder.none,
@@ -76,38 +95,38 @@ class EmployerDashboardScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    Icon(Icons.search, color: Color(0xFF8EACFE)),
+                    const Icon(Icons.search, color: Color(0xFF8EACFE)),
                   ],
                 ),
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               // My Vacancies
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('My Vacancies', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('See all', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold)),
+                  const Text('My Vacancies', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text('See all', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold)),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Color(0xFFE0E0E0).withOpacity(0.2),
+                      color: const Color(0xFFE0E0E0).withOpacity(0.2),
                       blurRadius: 12,
-                      offset: Offset(0, 2),
+                      offset: const Offset(0, 2),
                     ),
                   ],
                 ),
-                padding: EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+                padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
                 child: Row(
                   children: [
                     Image.asset('assets/airbnb_logo.png', height: 48, width: 48),
-                    SizedBox(width: 18),
-                    Expanded(
+                    const SizedBox(width: 18),
+                    const Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -123,41 +142,41 @@ class EmployerDashboardScreen extends StatelessWidget {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(0xFFDFF7E7),
+                            color: const Color(0xFFDFF7E7),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                          child: Text('Active', style: TextStyle(color: Color(0xFF49C178), fontWeight: FontWeight.bold)),
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          child: const Text('Active', style: TextStyle(color: Color(0xFF49C178), fontWeight: FontWeight.bold)),
                         ),
-                        SizedBox(height: 16),
-                        Text('\$2.350', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold, fontSize: 20)),
+                        const SizedBox(height: 16),
+                        const Text('\$2.350', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold, fontSize: 20)),
                       ],
                     ),
                   ],
                 ),
               ),
-              SizedBox(height: 32),
+              const SizedBox(height: 32),
               // Recent People Applied
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Recent People Applied', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  Text('See all', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold)),
+                  const Text('Recent People Applied', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                  const Text('See all', style: TextStyle(color: Color(0xFF4C7DFF), fontWeight: FontWeight.bold)),
                 ],
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildApplicantCard('Adam Smith', 'UI/UX Designer', 'assets/sample_photo_1.png'),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               _buildApplicantCard('Sarah Wilson', 'UI Designer', 'assets/sample_photo_2.png'),
-              Spacer(),
+              const Spacer(),
               // Bottom Nav
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFFF9FAFF),
+                  color: const Color(0xFFF9FAFF),
                   borderRadius: BorderRadius.circular(24),
                 ),
-                padding: EdgeInsets.symmetric(vertical: 10, horizontal: 24),
-                margin: EdgeInsets.only(bottom: 8),
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+                margin: const EdgeInsets.only(bottom: 8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -182,26 +201,26 @@ class EmployerDashboardScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Color(0xFFE0E0E0).withOpacity(0.2),
+            color: const Color(0xFFE0E0E0).withOpacity(0.2),
             blurRadius: 12,
-            offset: Offset(0, 2),
+            offset: const Offset(0, 2),
           ),
         ],
       ),
-      padding: EdgeInsets.symmetric(vertical: 18, horizontal: 18),
+      padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 18),
       child: Row(
         children: [
           CircleAvatar(
             backgroundImage: AssetImage(imagePath),
             radius: 28,
           ),
-          SizedBox(width: 18),
+          const SizedBox(width: 18),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
-                Text(job, style: TextStyle(color: Colors.black54, fontSize: 14)),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 17)),
+                Text(job, style: const TextStyle(color: Colors.black54, fontSize: 14)),
               ],
             ),
           ),
@@ -209,20 +228,20 @@ class EmployerDashboardScreen extends StatelessWidget {
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFFEDF2FF),
+                  color: const Color(0xFFEDF2FF),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.all(10),
-                child: Icon(Icons.chat_bubble_outline, color: Color(0xFF4C7DFF)),
+                padding: const EdgeInsets.all(10),
+                child: const Icon(Icons.chat_bubble_outline, color: Color(0xFF4C7DFF)),
               ),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               Container(
                 decoration: BoxDecoration(
-                  color: Color(0xFFEDF2FF),
+                  color: const Color(0xFFEDF2FF),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                padding: EdgeInsets.all(10),
-                child: Icon(Icons.video_call, color: Color(0xFF4C7DFF)),
+                padding: const EdgeInsets.all(10),
+                child: const Icon(Icons.video_call, color: Color(0xFF4C7DFF)),
               ),
             ],
           ),
@@ -234,13 +253,13 @@ class EmployerDashboardScreen extends StatelessWidget {
   Widget _buildBottomNavItem(IconData icon, String label, bool isActive) {
     return Column(
       children: [
-        Icon(icon, color: isActive ? Color(0xFF4C7DFF) : Color(0xFF8EACFE), size: 28),
+        Icon(icon, color: isActive ? const Color(0xFF4C7DFF) : const Color(0xFF8EACFE), size: 28),
         if (label.isNotEmpty)
           Text(
             label,
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              color: isActive ? Color(0xFF4C7DFF) : Color(0xFF8EACFE),
+              color: isActive ? const Color(0xFF4C7DFF) : const Color(0xFF8EACFE),
             ),
           ),
       ],
