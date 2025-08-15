@@ -30,7 +30,12 @@ class _JobCategoryScreenState extends State<JobCategoryScreen> {
     Icons.music_note_outlined,
   ];
 
-  final Set<int> selected = {};
+  final Set<int> selectedIndices = {}; // Renamed for clarity
+
+  // Helper method to get the selected category names
+  List<String> get selectedCategories {
+    return selectedIndices.map((index) => categories[index]).toList();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,20 +81,20 @@ class _JobCategoryScreenState extends State<JobCategoryScreen> {
                 child: GridView.builder(
                   itemCount: categories.length,
                   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2, // For desktop, can set to 3 if wider
+                    crossAxisCount: 2,
                     crossAxisSpacing: 24,
                     mainAxisSpacing: 24,
                     childAspectRatio: 1.6,
                   ),
                   itemBuilder: (context, index) {
-                    final isSelected = selected.contains(index);
+                    final isSelected = selectedIndices.contains(index);
                     return GestureDetector(
                       onTap: () {
                         setState(() {
                           if (isSelected) {
-                            selected.remove(index);
+                            selectedIndices.remove(index);
                           } else {
-                            if (selected.length < 5) selected.add(index);
+                            if (selectedIndices.length < 5) selectedIndices.add(index);
                           }
                         });
                       },
@@ -138,10 +143,14 @@ class _JobCategoryScreenState extends State<JobCategoryScreen> {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  onPressed: selected.length >= 3
-                      ? () {
-                          // TODO: Handle next navigation
-                        }
+                  onPressed: selectedIndices.length >= 3
+                  ? () {
+                    Navigator.pushNamed(
+                      context,
+                      '/profile-creation',
+                      arguments: selectedCategories,
+                      );
+                      }
                       : null,
                   child: const Text(
                     'Next',

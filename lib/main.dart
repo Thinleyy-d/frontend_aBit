@@ -1,5 +1,5 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
- // Import your token helper3
 
 // Screen Imports
 import 'screens/splash_screen.dart';
@@ -13,8 +13,10 @@ import 'screens/home_screen.dart';
 import 'screens/job_category_screen.dart';
 import 'screens/employer_dashboard_screen.dart';
 import 'screens/organization_profile_form_screen.dart';
-
- // Uncomment and make sure this path is correct
+import 'screens/logo_upload_screen.dart';
+import 'screens/application_screen.dart';
+import 'screens/profile_creation_screen.dart'; // Add this import
+import 'screens/home_dashboard_screen.dart'; // Add this import
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -112,9 +114,9 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      initialRoute: '/', // CHANGED: Start with the SplashScreen
+      initialRoute: '/',
       routes: {
-        '/': (context) => const SplashScreen(), // CHANGED: Splash screen is the initial route
+        '/': (context) => const SplashScreen(),
         '/signin': (context) => const SignInScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/forgot_password': (context) => const ForgotPasswordScreen(),
@@ -125,7 +127,23 @@ class MyApp extends StatelessWidget {
         '/job_category': (context) => const JobCategoryScreen(),
         '/employer_dashboard': (context) => const EmployerDashboardScreen(),
         '/organization_profile_form': (context) => const OrganizationProfileFormScreen(),
-        // UNCOMMENTED: Make sure you have this screen
+        '/applications': (context) => const ApplicationsScreen(),
+        '/logo_upload': (context) => LogoUploadScreen(
+          onLogoSelected: (String imagePath) {
+            // Handle logo selection
+          },
+        ),
+        '/profile-creation': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as List<String>;
+          return ProfileCreationScreen(selectedJobCategories: args);
+        },
+        '/home-dashboard': (context) {
+          final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+          return HomeDashboardScreen(
+            name: args['name'],
+            jobCategories: args['jobCategories'],
+          );
+        },
       },
     );
   }
