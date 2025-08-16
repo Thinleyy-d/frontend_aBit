@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/material.dart';
+
 
 class ApplicationsScreen extends StatelessWidget {
   const ApplicationsScreen({super.key});
@@ -123,11 +123,8 @@ class ApplicationsScreen extends StatelessWidget {
   }
 
   Widget _buildContentSection(ThemeData theme, BuildContext context) {
-    final bool hasApplications = false; // Replace with your logic
-
-    return hasApplications
-        ? _buildApplicationsList() // Implement this method
-        : _buildEmptyState(theme, context);
+    
+    return _buildEmptyState(theme, context);
   }
 
   Widget _buildEmptyState(ThemeData theme, BuildContext context) {
@@ -187,12 +184,5 @@ class ApplicationsScreen extends StatelessWidget {
     // Implement filter logic
     // setState if using StatefulWidget
   }
-
-  Widget _buildApplicationsList() {
-    // Implement your applications list view
-    return ListView.builder(
-      itemCount: 0, // Replace with actual count
-      itemBuilder: (context, index) => const SizedBox.shrink(),
-    );
-  }
+  
 }

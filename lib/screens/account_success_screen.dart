@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/gawean_logo.dart';
 import '../widgets/gradient_background.dart';
-import 'package:flutter/material.dart';
+
 
 class AccountSuccessScreen extends StatelessWidget {
   const AccountSuccessScreen({super.key});

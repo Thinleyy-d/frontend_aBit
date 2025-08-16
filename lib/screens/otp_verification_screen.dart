@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/pin_input_field.dart';
-import 'package:flutter/material.dart';
+
 
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;

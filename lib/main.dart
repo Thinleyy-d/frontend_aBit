@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 
 // Screen Imports
 import 'screens/splash_screen.dart';

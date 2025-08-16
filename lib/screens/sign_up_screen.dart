@@ -3,7 +3,7 @@ import 'package:flutter/gestures.dart';
 import '../widgets/gawean_logo.dart';
 import '../widgets/gradient_background.dart';
 import '../widgets/social_auth_button.dart';
-import 'package:flutter/material.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
