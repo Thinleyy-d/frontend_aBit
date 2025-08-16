@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/material.dart';
 
 class LogoUploadScreen extends StatefulWidget {
   final String? currentLogoPath;
@@ -19,6 +20,7 @@ class LogoUploadScreen extends StatefulWidget {
 class _LogoUploadScreenState extends State<LogoUploadScreen> {
   String? _selectedLogoPath;
   final ImagePicker _picker = ImagePicker();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -26,33 +28,36 @@ class _LogoUploadScreenState extends State<LogoUploadScreen> {
     _selectedLogoPath = widget.currentLogoPath;
   }
 
-  Future<void> _pickImageFromGallery() async {
+  Future<void> _pickImage(ImageSource source) async {
+    setState(() => _isLoading = true);
     try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if (image != null) {
-        setState(() {
-          _selectedLogoPath = image.path;
-        });
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to pick image: ${e.toString()}')),
+      final XFile? image = await _picker.pickImage(
+        source: source,
+        maxWidth: 800,
+        maxHeight: 800,
+        imageQuality: 85,
       );
-    }
-  }
 
-  Future<void> _pickImageFromCamera() async {
-    try {
-      final XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if (image != null) {
-        setState(() {
-          _selectedLogoPath = image.path;
-        });
+      if (image != null && mounted) {
+        setState(() => _selectedLogoPath = image.path);
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to capture image: ${e.toString()}')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              source == ImageSource.camera 
+                ? 'Failed to capture image: ${e.toString()}'
+                : 'Failed to pick image: ${e.toString()}',
+            ),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -62,81 +67,181 @@ class _LogoUploadScreenState extends State<LogoUploadScreen> {
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a logo first')),
+        const SnackBar(
+          content: Text('Please select a logo first'),
+          behavior: SnackBarBehavior.floating,
+        ),
       );
     }
   }
 
+  Widget _buildLogoPreview() {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 200,
+          height: 200,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: Colors.grey.shade100,
+            border: Border.all(
+              color: Colors.grey.shade300,
+              width: 1,
+            ),
+          ),
+          child: _selectedLogoPath != null
+              ? ClipOval(
+                  child: _selectedLogoPath!.startsWith('http')
+                      ? Image.network(
+                          _selectedLogoPath!,
+                          fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
+                        )
+                      : Image.file(
+                          File(_selectedLogoPath!),
+                          fit: BoxFit.cover,
+                        ),
+                )
+              : const Icon(
+                  Icons.business,
+                  size: 50,
+                  color: Colors.grey,
+                ),
+        ),
+        if (_isLoading)
+          const Positioned.fill(
+            child: CircularProgressIndicator(),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Change Logo'),
+        title: const Text('Upload Company Logo'),
         centerTitle: true,
+        actions: [
+          if (_selectedLogoPath != null)
+            IconButton(
+              icon: const Icon(Icons.delete),
+              onPressed: () => setState(() => _selectedLogoPath = null),
+              tooltip: 'Remove Logo',
+            ),
+        ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            const Text(
-              'Company Logo',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
             const SizedBox(height: 16),
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey[200],
-                image: _selectedLogoPath != null
-                    ? DecorationImage(
-                        image: _selectedLogoPath!.startsWith('http')
-                            ? NetworkImage(_selectedLogoPath!)
-                            : FileImage(File(_selectedLogoPath!)) as ImageProvider,
-                        fit: BoxFit.cover,
-                      )
-                    : null,
+            Text(
+              'Company Logo',
+              style: theme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
               ),
-              child: _selectedLogoPath == null
-                  ? const Icon(Icons.business, size: 50, color: Colors.grey)
-                  : null,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Upload a high-quality logo for your company',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey.shade600,
+              ),
             ),
             const SizedBox(height: 32),
+            _buildLogoPreview(),
+            const SizedBox(height: 40),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                ElevatedButton.icon(
-                  onPressed: _pickImageFromGallery,
-                  icon: const Icon(Icons.photo_library),
-                  label: const Text('From Gallery'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
+                _buildImageSourceButton(
+                  icon: Icons.photo_library,
+                  label: 'Gallery',
+                  onPressed: () => _pickImage(ImageSource.gallery),
+                  color: theme.colorScheme.primary,
                 ),
                 const SizedBox(width: 16),
-                ElevatedButton.icon(
-                  onPressed: _pickImageFromCamera,
-                  icon: const Icon(Icons.camera_alt),
-                  label: const Text('Take Photo'),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  ),
+                _buildImageSourceButton(
+                  icon: Icons.camera_alt,
+                  label: 'Camera',
+                  onPressed: () => _pickImage(ImageSource.camera),
+                  color: theme.colorScheme.secondary,
                 ),
               ],
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 40),
             SizedBox(
-              width: 200,
+              width: double.infinity,
               child: ElevatedButton(
-                onPressed: _confirmSelection,
-                child: const Text('Confirm Logo'),
+                onPressed: _selectedLogoPath != null ? _confirmSelection : null,
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                child: const Text(
+                  'Confirm Logo',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ),
+            if (_selectedLogoPath != null)
+              TextButton(
+                onPressed: () => setState(() => _selectedLogoPath = null),
+                child: const Text('Remove Logo'),
+              ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildImageSourceButton({
+    required IconData icon,
+    required String label,
+    required VoidCallback onPressed,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.1),
+            shape: BoxShape.circle,
+          ),
+          padding: const EdgeInsets.all(16),
+          child: Icon(
+            icon,
+            size: 28,
+            color: color,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            color: color,
+          ),
+        ),
+      ],
     );
   }
 }

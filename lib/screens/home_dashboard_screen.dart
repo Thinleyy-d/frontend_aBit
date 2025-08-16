@@ -1,29 +1,9 @@
 import 'package:flutter/material.dart';
 
-// --- Models (New Addition) ---
-// Define a simple Job model for better data handling
-class Job {
-  final String title;
-  final String company;
-  final String location;
-  final String type;
-  final String salary;
-  final String logoAsset; // Path to the company logo
-
-  Job({
-    required this.title,
-    required this.company,
-    required this.location,
-    required this.type,
-    required this.salary,
-    required this.logoAsset,
-  });
-}
-
-class HomeDashboardScreen extends StatefulWidget {
+class HomeDashboardScreen extends StatelessWidget {
   final String name;
   final List<String> jobCategories;
-
+  
   const HomeDashboardScreen({
     super.key,
     required this.name,
@@ -31,397 +11,414 @@ class HomeDashboardScreen extends StatefulWidget {
   });
 
   @override
-  State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
-}
-
-class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
-  String _selectedCategory = 'All Job'; // State for active job category
-
-  // --- Dummy Data (New Addition) ---
-  final List<Job> _allJobs = [
-    Job(
-      title: 'UI/UX Designer',
-      company: 'AirBNB',
-      location: 'United States',
-      type: 'Full Time',
-      salary: '\$2,350',
-      logoAsset: 'assets/airbnb_logo.png', // Make sure these assets exist
-    ),
-    Job(
-      title: 'Financial Planner',
-      company: 'Twitter',
-      location: 'United Kingdom',
-      type: 'Part Time',
-      salary: '\$2,200',
-      logoAsset: 'assets/twitter_logo.png', // Make sure these assets exist
-    ),
-    Job(
-      title: 'Software Engineer',
-      company: 'Google',
-      location: 'Remote',
-      type: 'Full Time',
-      salary: '\$5,000',
-      logoAsset: 'assets/google_logo.webp', // Example, add this asset
-    ),
-    Job(
-      title: 'Marketing Specialist',
-      company: 'Facebook',
-      location: 'Ireland',
-      type: 'Full Time',
-      salary: '\$3,100',
-      logoAsset: 'assets/facebook_logo.png', // Example, add this asset
-    ),
-  ];
-
-  List<Job> get _filteredJobs {
-    if (_selectedCategory == 'All Job') {
-      return _allJobs;
-    }
-    // Simple filtering based on a partial match with job title for demonstration
-    // In a real app, you'd have proper category tags on Job objects
-    return _allJobs.where((job) => job.title.toLowerCase().contains(_selectedCategory.toLowerCase())).toList();
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    // Ensure 'All Job' is the default and add it if not present
-    if (!widget.jobCategories.contains('All Job')) {
-      // Note: This modifies the passed list, consider making jobCategories a copy if it's immutable
-      widget.jobCategories.insert(0, 'All Job');
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final ThemeData theme = Theme.of(context);
+    final bool isLargeScreen = MediaQuery.of(context).size.width > 600;
+    final Color primaryColor = theme.colorScheme.primary;
+    final Color secondaryColor = theme.colorScheme.secondary;
+
     return Scaffold(
-      backgroundColor: Colors.grey[50], // Lighter background for a modern feel
       appBar: AppBar(
-        backgroundColor: Colors.grey[50],
-        elevation: 0, // No shadow for a flatter design
-        title: Text(
-          'Hello, ${widget.name}!',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-            fontSize: 24, // Slightly larger title
-          ),
-        ),
+        title: Text('Welcome back, $name!', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
-            icon: Icon(Icons.notifications_none, color: Colors.grey[700]), // Notification icon
-            onPressed: () {
-              // Handle notifications
-            },
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () => _showNotifications(context),
+            tooltip: 'Notifications',
           ),
           IconButton(
-            icon: Icon(Icons.account_circle, color: Colors.grey[700]), // User profile icon
-            onPressed: () {
-              // Handle profile
-            },
+            icon: const Icon(Icons.search),
+            onPressed: () => _showSearch(context),
+            tooltip: 'Search Jobs',
           ),
         ],
       ),
-      body: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 1000), // Slightly narrower max width for content focus
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Search Bar
-                _buildSearchBar(),
-                const SizedBox(height: 32), // Increased spacing
-
-                // Tips Section
-                _buildSectionHeader(title: 'Tips for you', onPressed: () {
-                  // Navigate to tips section
-                }),
-                const SizedBox(height: 16),
-                _buildTipCard(),
-                const SizedBox(height: 32),
-
-                // Job Recommendations Section
-                _buildSectionHeader(title: 'Job Recommendation', onPressed: () {
-                  // Navigate to all job recommendations
-                }),
-                const SizedBox(height: 20), // Adjusted spacing
-
-                // Job Category Tabs
-                _buildCategoryTabs(),
-                const SizedBox(height: 20),
-
-                // Job Listings
-                _buildJobListings(),
-              ],
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1200),
+            child: SingleChildScrollView(
+              padding: EdgeInsets.all(isLargeScreen ? 24 : 16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Search Bar
+                  _buildSearchBar(theme, context),
+                  const SizedBox(height: 32),
+                  
+                  // Tips Section
+                  _buildSectionHeader(
+                    context: context,
+                    title: 'Career Tips for You',
+                    onSeeAll: () => _navigateToTips(context),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildTipCard(
+                    title: 'How to Ace Your Next Interview',
+                    content: 'Learn the top strategies to impress your interviewers',
+                    onTap: () => _showTipDetail(context, 'Interview Tips'),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  // Job Recommendations
+                  _buildSectionHeader(
+                    context: context,
+                    title: 'Personalized Job Recommendations',
+                    onSeeAll: () => _navigateToAllJobs(context),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Job Category Tabs
+                  _buildCategoryTabs(jobCategories, primaryColor),
+                  const SizedBox(height: 24),
+                  
+                  // Job Listings
+                  _buildJobListing(
+                    company: 'AirBNB',
+                    position: 'UI/UX Designer',
+                    location: 'United States',
+                    type: 'Full Time',
+                    salary: '\$2,350',
+                    logo: 'assets/airbnb_logo.png',
+                    onTap: () => _showJobDetail(context, 'UI/UX Designer'),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildJobListing(
+                    company: 'Twitter',
+                    position: 'Financial Planner',
+                    location: 'United Kingdom',
+                    type: 'Part Time',
+                    salary: '\$2,200',
+                    logo: 'assets/twitter_logo.png',
+                    onTap: () => _showJobDetail(context, 'Financial Planner'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
       ),
+      bottomNavigationBar: _buildBottomNavigationBar(primaryColor, secondaryColor),
     );
   }
 
-  // --- Reusable Widgets (Extracted for better readability) ---
-
-  Widget _buildSearchBar() {
+  Widget _buildSearchBar(ThemeData theme, BuildContext context) {
     return TextField(
       decoration: InputDecoration(
-        hintText: 'Search for jobs...',
-        prefixIcon: const Icon(Icons.search, color: Colors.grey),
-        filled: true,
-        fillColor: Colors.white,
+        hintText: 'Search for jobs, companies, or locations...',
+        prefixIcon: const Icon(Icons.search),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12), // More rounded corners
-          borderSide: BorderSide.none, // No border line
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        suffixIcon: IconButton( // Added a filter icon
-          icon: const Icon(Icons.filter_list, color: Colors.grey),
-          onPressed: () {
-            // Open filter options
-          },
-        ),
+        filled: true,
+        fillColor: theme.cardColor,
+        contentPadding: const EdgeInsets.symmetric(vertical: 16),
       ),
-      style: TextStyle(fontSize: 16),
+      onTap: () => _showSearch(context),
     );
   }
 
-  Widget _buildSectionHeader({required String title, required VoidCallback onPressed}) {
+  Widget _buildSectionHeader({
+    required BuildContext context,
+    required String title,
+    required VoidCallback onSeeAll,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 20, // Slightly larger
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
         ),
         TextButton(
-          onPressed: onPressed,
+          onPressed: onSeeAll,
+          child: const Text('See All'),
           style: TextButton.styleFrom(
-            foregroundColor: Colors.blueAccent[700], // Accent color for text button
+            padding: EdgeInsets.zero,
           ),
-          child: const Text('See all'),
         ),
       ],
     );
   }
 
-  Widget _buildTipCard() {
+  Widget _buildTipCard({
+    required String title,
+    required String content,
+    required VoidCallback onTap,
+  }) {
     return Card(
-      elevation: 4, // Added shadow
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)), // More rounded
-      child: Container( // Wrap with Container for consistent padding
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          gradient: LinearGradient( // Subtle gradient for visual appeal
-            colors: [Colors.blue.shade100, Colors.blue.shade200],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'How to find a perfect job for you',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.blueGrey, // Adjusted text color
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              'Discover expert tips and strategies to land your dream job today!',
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.blueGrey[700],
-              ),
-            ),
-            const SizedBox(height: 16),
-            Align(
-              alignment: Alignment.bottomRight,
-              child: TextButton(
-                onPressed: () {
-                  // Read more functionality
-                },
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.blue.shade800,
-                  backgroundColor: Colors.white.withOpacity(0.8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                ),
-                child: const Text('Read more'),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildCategoryTabs() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: widget.jobCategories.map((category) {
-          final bool isActive = _selectedCategory == category;
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedCategory = category;
-              });
-              // In a real app, you would fetch or filter jobs based on this category
-            },
-            child: AnimatedContainer( // Add animation for smoother transitions
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeInOut,
-              margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: BoxDecoration(
-                color: isActive ? Colors.blue.shade700 : Colors.grey[200],
-                borderRadius: BorderRadius.circular(25), // More pill-shaped
-                boxShadow: isActive
-                    ? [
-                        BoxShadow(
-                          color: Colors.blue.shade700.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ]
-                    : null,
-              ),
-              child: Text(
-                category,
-                style: TextStyle(
-                  color: isActive ? Colors.white : Colors.black87,
-                  fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-                  fontSize: 15,
-                ),
-              ),
-            ),
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  Widget _buildJobListings() {
-    if (_filteredJobs.isEmpty) {
-      return Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Text(
-            'No jobs found for "${_selectedCategory}" category.',
-            style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      );
-    }
-    return Column(
-      children: _filteredJobs.map((job) => _buildJobCard(job)).toList(),
-    );
-  }
-
-  Widget _buildJobCard(Job job) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 16), // Spacing between cards
       elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: InkWell( // Use InkWell for ripple effect on tap
-        onTap: () {
-          // Navigate to job detail screen
-          print('Tapped on ${job.title}');
-        },
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  image: DecorationImage(
-                    image: AssetImage(job.logoAsset), // Use job's specific logo
-                    fit: BoxFit.contain,
-                  ),
-                  border: Border.all(color: Colors.grey.shade200, width: 1),
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      job.title,
-                      style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '${job.company} • ${job.location}',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        job.type,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.blue.shade700,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 8),
+              Text(
+                content,
+                style: TextStyle(
+                  color: Colors.grey[600],
                 ),
               ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    job.salary,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.green, // Highlight salary
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Icon(Icons.bookmark_border, color: Colors.grey[400]), // Bookmark icon
-                ],
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: onTap,
+                  child: const Text('Read More'),
+                ),
               ),
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildCategoryTabs(List<String> categories, Color primaryColor) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          _buildCategoryTab('All Jobs', true, primaryColor),
+          ...categories.map((category) => 
+            _buildCategoryTab(category, false, primaryColor)
+          ).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCategoryTab(String title, bool isActive, Color primaryColor) {
+    return Container(
+      margin: const EdgeInsets.only(right: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      decoration: BoxDecoration(
+        color: isActive ? primaryColor : Colors.grey[200],
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Text(
+        title,
+        style: TextStyle(
+          color: isActive ? Colors.white : Colors.black,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildJobListing({
+    required String company,
+    required String position,
+    required String location,
+    required String type,
+    required String salary,
+    required String logo,
+    required VoidCallback onTap,
+  }) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                leading: CircleAvatar(
+                  radius: 24,
+                  backgroundImage: AssetImage(logo),
+                ),
+                title: Text(
+                  position,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                subtitle: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('$company • $location'),
+                    Text(type),
+                  ],
+                ),
+                trailing: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      salary,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const Text('/month'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBottomNavigationBar(Color primaryColor, Color secondaryColor) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: primaryColor,
+      unselectedItemColor: secondaryColor,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search),
+          label: 'Search',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bookmark_border),
+          label: 'Saved',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          label: 'Profile',
+        ),
+      ],
+    );
+  }
+
+  void _showNotifications(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Placeholder(), // Replace with notifications screen
+      ),
+    );
+  }
+
+  void _showSearch(BuildContext context) {
+    showSearch(
+      context: context,
+      delegate: CustomSearchDelegate(),
+    );
+  }
+
+  void _navigateToTips(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Placeholder(), // Replace with tips screen
+      ),
+    );
+  }
+
+  void _showTipDetail(BuildContext context, String tipTitle) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(tipTitle),
+        content: const Text('Detailed content about this tip would appear here.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _navigateToAllJobs(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const Placeholder(), // Replace with jobs screen
+      ),
+    );
+  }
+
+  void _showJobDetail(BuildContext context, String jobTitle) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(jobTitle),
+        content: const Text('Detailed information about this job would appear here.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              // Add apply logic here
+            },
+            child: const Text('Apply'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CustomSearchDelegate extends SearchDelegate<String> {
+  @override
+  List<Widget> buildActions(BuildContext context) {
+    return [
+      IconButton(
+        icon: const Icon(Icons.clear),
+        onPressed: () {
+          query = '';
+        },
+      ),
+    ];
+  }
+
+  @override
+  Widget buildLeading(BuildContext context) {
+    return IconButton(
+      icon: const Icon(Icons.arrow_back),
+      onPressed: () {
+        close(context, '');
+      },
+    );
+  }
+
+  @override
+  Widget buildResults(BuildContext context) {
+    return Center(
+      child: Text('Search results for: $query'),
+    );
+  }
+
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return Center(
+      child: Text('Suggestions for: $query'),
     );
   }
 }

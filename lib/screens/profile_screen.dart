@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-
-// This file contains a single widget, ProfilePage, which should be imported
-// and used within a main application file that defines your MaterialApp and routes.
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:flutter/material.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -12,28 +12,58 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final _formKey = GlobalKey<FormState>();
-  
-  // Controllers for the text fields
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _dobController = TextEditingController();
   final _addressController = TextEditingController();
   final _occupationController = TextEditingController();
+  File? _profileImage;
 
-  // Handle the "Confirm" button press
-  void _onConfirm() {
-    if (_formKey.currentState!.validate()) {
-      // Logic for handling the form data
-      // For now, we'll just print the values to the console
-      print('Full Name: ${_fullNameController.text}');
-      print('Email: ${_emailController.text}');
-      print('Date of Birth: ${_dobController.text}');
-      print('Address: ${_addressController.text}');
-      print('Occupation: ${_occupationController.text}');
+  Future<void> _pickImage() async {
+    final pickedFile = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
     }
   }
 
-  // A helper widget for the form text fields
+  Future<void> _selectDate() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+    );
+    if (picked != null) {
+      setState(() {
+        _dobController.text = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
+  }
+
+  void _onConfirm() {
+    if (_formKey.currentState!.validate()) {
+      // Here you would typically send data to your backend
+      final profileData = {
+        'fullName': _fullNameController.text,
+        'email': _emailController.text,
+        'dob': _dobController.text,
+        'address': _addressController.text,
+        'occupation': _occupationController.text,
+        'hasImage': _profileImage != null,
+      };
+
+      print('Profile Data: $profileData');
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile saved successfully!')),
+      );
+      
+      // Navigate to home or next screen
+      // Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
   Widget _buildTextField({
     required String label,
     required String hint,
@@ -42,6 +72,7 @@ class _ProfilePageState extends State<ProfilePage> {
     Widget? suffixIcon,
     bool readOnly = false,
     void Function()? onTap,
+    TextInputType? keyboardType,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -70,6 +101,7 @@ class _ProfilePageState extends State<ProfilePage> {
           controller: controller,
           readOnly: readOnly,
           onTap: onTap,
+          keyboardType: keyboardType,
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: const TextStyle(color: Colors.grey),
@@ -86,6 +118,9 @@ class _ProfilePageState extends State<ProfilePage> {
             if (isRequired && (value == null || value.isEmpty)) {
               return 'This field is required';
             }
+            if (label.contains('Email') && !value!.contains('@')) {
+              return 'Please enter a valid email';
+            }
             return null;
           },
         ),
@@ -94,15 +129,21 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   @override
+  void dispose() {
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _dobController.dispose();
+    _addressController.dispose();
+    _occupationController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    // Get screen width to make the layout responsive for desktop
     double screenWidth = MediaQuery.of(context).size.width;
     double formWidth = screenWidth * 0.4;
-    if (formWidth < 400) {
-      formWidth = screenWidth * 0.9;
-    } else if (formWidth > 600) {
-      formWidth = 600;
-    }
+    if (formWidth < 400) formWidth = screenWidth * 0.9;
+    if (formWidth > 600) formWidth = 600;
 
     return Scaffold(
       appBar: AppBar(
@@ -111,10 +152,7 @@ class _ProfilePageState extends State<ProfilePage> {
         titleSpacing: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () {
-            // This will pop the current screen off the navigation stack
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
         title: const Padding(
           padding: EdgeInsets.only(left: 16.0),
@@ -153,88 +191,73 @@ class _ProfilePageState extends State<ProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Upload Photo Section
-                    Container(
-                      padding: const EdgeInsets.all(24.0),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF9F9F9),
-                        borderRadius: BorderRadius.circular(16.0),
-                        border: Border.all(color: const Color(0xFFE0E0E0)),
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.cloud_upload_outlined,
-                            size: 48,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 8.0),
-                          const Text(
-                            'Upload Photo Profile',
-                            style: TextStyle(
-                              color: Colors.grey,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 8.0),
-                          SizedBox(
-                            width: 150,
-                            child: ElevatedButton(
-                              onPressed: () {
-                                // Placeholder for upload logic
-                                print('Upload photo button pressed');
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: const Color(0xFFE3F2FD),
-                                elevation: 0,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12.0),
-                                ),
-                              ),
-                              child: const Text(
-                                'Select Photo',
-                                style: TextStyle(color: Colors.blue),
+                    GestureDetector(
+                      onTap: _pickImage,
+                      child: Container(
+                        padding: const EdgeInsets.all(24.0),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF9F9F9),
+                          borderRadius: BorderRadius.circular(16.0),
+                          border: Border.all(color: const Color(0xFFE0E0E0)),
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            _profileImage != null
+                                ? CircleAvatar(
+                                    radius: 48,
+                                    backgroundImage: FileImage(_profileImage!),
+                                  )
+                                : const Icon(
+                                    Icons.cloud_upload_outlined,
+                                    size: 48,
+                                    color: Colors.grey,
+                                  ),
+                            const SizedBox(height: 8.0),
+                            Text(
+                              _profileImage != null ? 'Change Profile Photo' : 'Upload Photo Profile',
+                              style: const TextStyle(
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24.0),
                     _buildTextField(
                       label: 'Full Name',
-                      hint: 'Full Name',
+                      hint: 'Enter your full name',
                       controller: _fullNameController,
                     ),
                     const SizedBox(height: 24.0),
                     _buildTextField(
                       label: 'Email',
-                      hint: 'Email',
+                      hint: 'Enter your email',
                       controller: _emailController,
+                      keyboardType: TextInputType.emailAddress,
                       suffixIcon: const Icon(Icons.email_outlined, color: Colors.grey),
                     ),
                     const SizedBox(height: 24.0),
                     _buildTextField(
                       label: 'Date of birth',
-                      hint: 'Date of birth',
+                      hint: 'Select your date of birth',
                       controller: _dobController,
                       readOnly: true,
-                      onTap: () {
-                        // Placeholder for date picker
-                        print('Date of birth field tapped');
-                      },
+                      onTap: _selectDate,
                       suffixIcon: const Icon(Icons.calendar_month_outlined, color: Colors.grey),
                     ),
                     const SizedBox(height: 24.0),
                     _buildTextField(
                       label: 'Address',
-                      hint: 'Address',
+                      hint: 'Enter your address',
                       controller: _addressController,
                     ),
                     const SizedBox(height: 24.0),
                     _buildTextField(
                       label: 'Occupation',
-                      hint: 'Occupation',
+                      hint: 'Enter your occupation',
                       controller: _occupationController,
                     ),
                     const SizedBox(height: 32.0),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/gawean_logo.dart';
 import '../widgets/gradient_background.dart';
-import 'package:job_portal_ui/utils/shared_preferences_helper.dart'; // Import your token helper
+import '../helpers/shared_preferences_helper.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -11,36 +11,45 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  bool _showContinueButton = false; // New state to control button visibility
+  bool _showContinueButton = false;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _checkAuthAndNavigate();
+    _initializeApp();
   }
 
-  Future<void> _checkAuthAndNavigate() async {
-    // Introduce a small delay to show the splash screen content
-    // You can adjust this duration (e.g., 2 or 3 seconds)
-    await Future.delayed(const Duration(seconds: 1)); // Shortened for faster testing
+  Future<void> _initializeApp() async {
+    await Future.delayed(const Duration(milliseconds: 800));
 
-    final String? token = await SharedPreferencesHelper.getToken();
-
-    // Check if the widget is still mounted before navigating or updating state
     if (!mounted) return;
 
-    if (token != null) {
-      // If a token exists, navigate directly to the home screen
-      // Replace '/home' with your actual home screen route (e.g., '/dashboard')
-      Navigator.of(context).pushReplacementNamed('/home');
+    final bool isFirstLaunch = await SharedPreferencesHelper.isFirstLaunch;
+    final String? token = await SharedPreferencesHelper.getToken();
+
+    if (!mounted) return;
+
+    if (isFirstLaunch) {
+      await _showWelcomeAnimation();
+      await SharedPreferencesHelper.setFirstLaunchComplete();
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/landing');
+    } else if (token != null) {
+      Navigator.pushReplacementNamed(context, '/home-dashboard', arguments: {
+        'name': 'User', // Replace with actual user name
+        'jobCategories': ['All', 'Design', 'Development', 'Marketing'],
+      });
     } else {
-      // If no token, show the 'Continue' button to let the user proceed to signin
       setState(() {
+        _isLoading = false;
         _showContinueButton = true;
       });
-      // Optionally, you could also automatically navigate to /signin after a delay here,
-      // but keeping the button allows for a manual "Continue" action.
     }
+  }
+
+  Future<void> _showWelcomeAnimation() async {
+    await Future.delayed(const Duration(milliseconds: 500));
   }
 
   @override
@@ -48,38 +57,91 @@ class _SplashScreenState extends State<SplashScreen> {
     return GradientBackground(
       child: Scaffold(
         backgroundColor: Colors.transparent,
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 500),
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const GaweanLogo(
-                    iconSize: 100,
-                    fontSize: 36,
-                    tagline: 'The best portal job of this century',
-                  ),
-                  const SizedBox(height: 80),
-                  // Conditionally show the ElevatedButton
-                  _showContinueButton
-                      ? ElevatedButton(
-                          onPressed: () {
-                            // This button only appears if no token was found
-                            Navigator.pushReplacementNamed(context, '/signin');
-                          },
-                          child: const Text('Continue'),
-                        )
-                      :
-                      // Show a small progress indicator while checking for token, if the button isn't shown yet
-                      const CircularProgressIndicator(), // Or just an empty SizedBox if you don't want a spinner
-                ],
+        body: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Spacer(flex: 2),
+                    const GaweanLogo(
+                      iconSize: 100,
+                      fontSize: 36,
+                      tagline: 'The best portal job of this century',
+                    ),
+                    const Spacer(flex: 3),
+                    _buildBottomContent(),
+                  ],
+                ),
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildBottomContent() {
+    if (_isLoading) {
+      return const Column(
+        children: [
+          CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Loading...',
+            style: TextStyle(color: Colors.white),
+          ),
+        ],
+      );
+    }
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      child: _showContinueButton
+          ? Column(
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/signin');
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.blue,
+                    minimumSize: const Size(double.infinity, 50),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/signup');
+                  },
+                  child: const Text(
+                    'Create New Account',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            )
+          : const SizedBox.shrink(),
     );
   }
 }
