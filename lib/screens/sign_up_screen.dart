@@ -80,7 +80,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
             icon: const Icon(Icons.arrow_back_ios_new),
             color: Color.fromARGB(255, 128, 128, 128),
             onPressed: () {
-              Navigator.pushNamed(context, '/splash');
+              Navigator.pushNamed(context, '/signin');
             }, // Back arrow functionality
           ),
         ),

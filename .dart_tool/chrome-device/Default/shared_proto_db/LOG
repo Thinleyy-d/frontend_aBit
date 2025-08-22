@@ -1,3 +1,11 @@
-2025/08/21-16:54:04.930 523c9 Reusing MANIFEST /private/var/folders/gm/wp4j_jzs26z_zmkmjl6j9qg40000gn/T/flutter_tools.kGHJB4/flutter_tools_chrome_device.eFSi8r/Default/shared_proto_db/MANIFEST-000001
-2025/08/21-16:54:04.930 523c9 Recovering log #3
-2025/08/21-16:54:04.931 523c9 Reusing old log /private/var/folders/gm/wp4j_jzs26z_zmkmjl6j9qg40000gn/T/flutter_tools.kGHJB4/flutter_tools_chrome_device.eFSi8r/Default/shared_proto_db/000003.log 
+2025/08/22-10:10:26.451 5bdc Reusing MANIFEST C:\Users\HP\AppData\Local\Temp\flutter_tools.d464965d\flutter_tools_chrome_device.a0054af6\Default\shared_proto_db/MANIFEST-000001
+2025/08/22-10:10:26.451 5bdc Recovering log #11
+2025/08/22-10:10:26.452 5bdc Reusing old log C:\Users\HP\AppData\Local\Temp\flutter_tools.d464965d\flutter_tools_chrome_device.a0054af6\Default\shared_proto_db/000011.log 
+2025/08/22-10:10:26.453 5bdc Delete type=0 #3
+2025/08/22-10:10:26.453 5bdc Delete type=0 #4
+2025/08/22-10:10:26.453 5bdc Delete type=2 #5
+2025/08/22-10:10:26.453 5bdc Delete type=0 #7
+2025/08/22-10:10:26.453 5bdc Delete type=2 #8
+2025/08/22-10:10:26.453 5bdc Delete type=2 #10
+2025/08/22-10:10:26.453 5bdc Delete type=0 #10
+2025/08/22-10:10:26.453 5bdc Delete type=2 #11

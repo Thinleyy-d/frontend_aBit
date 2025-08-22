@@ -47,7 +47,9 @@ class _SignInScreenState extends State<SignInScreen> {
         appBar: AppBar(
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new),
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/splash');
+                  },
           ),
         ),
         body: Center(

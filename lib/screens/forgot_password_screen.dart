@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import '../widgets/gradient_background.dart';
-import '../widgets/auth_header.dart';
-import '../widgets/custom_text_field.dart';
 import '../widgets/rounded_button.dart';
 
 class ForgotPasswordScreen extends StatelessWidget {
