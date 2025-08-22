@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -70,6 +71,48 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  // Add logout functionality
+  void _logout(BuildContext context) async {
+    // Show confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      // Clear the profile flag
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasProfile', false);
+      
+      // Show logout success message
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Logged out successfully'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      
+      // Since we're already on the home screen, just refresh the state
+      // by pushing a replacement to the same route
+      Navigator.pushReplacementNamed(context, '/home');
+    }
   }
 
   Widget _buildLogoSection(Color primaryColor) {
@@ -196,6 +239,51 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+          const SizedBox(height: 24),
+          
+          // Logout Button (only shown if user has a profile)
+          FutureBuilder(
+            future: SharedPreferences.getInstance(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                final hasProfile = snapshot.data!.getBool('hasProfile') ?? false;
+                
+                if (hasProfile) {
+                  return SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: Colors.red, width: 1.5),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(24),
+                        ),
+                        backgroundColor: Colors.white,
+                        elevation: 0,
+                      ),
+                      onPressed: () => _logout(context),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.logout, color: Colors.red),
+                          SizedBox(width: 8),
+                          Text(
+                            'Logout',
+                            style: TextStyle(
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
+              }
+              return const SizedBox.shrink();
+            },
           ),
         ],
       ),

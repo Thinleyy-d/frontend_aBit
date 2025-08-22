@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class ProfileCreationScreen extends StatefulWidget {
@@ -74,6 +75,20 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
     try {
       // Simulate API call
       await Future.delayed(const Duration(seconds: 1));
+      
+      // Save profile status to SharedPreferences
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasProfile', true);
+      
+      // Save profile data
+      await prefs.setString('userName', _fullNameController.text);
+      await prefs.setString('userEmail', _emailController.text);
+      await prefs.setString('userOccupation', _occupationController.text);
+      await prefs.setString('userAddress', _addressController.text);
+      await prefs.setString('userDob', _dobController.text);
+      
+      // Save selected job categories
+      await prefs.setStringList('userJobCategories', widget.selectedJobCategories);
       
       if (mounted) {
         Navigator.pushReplacementNamed(

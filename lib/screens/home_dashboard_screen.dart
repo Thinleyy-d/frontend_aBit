@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeDashboardScreen extends StatelessWidget {
   final String name;
   final List<String> jobCategories;
-  
+
   const HomeDashboardScreen({
     super.key,
     required this.name,
@@ -31,6 +32,27 @@ class HomeDashboardScreen extends StatelessWidget {
             onPressed: () => _showSearch(context),
             tooltip: 'Search Jobs',
           ),
+          // Add logout button to app bar
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (value) {
+              if (value == 'logout') {
+                _logout(context);
+              } else if (value == 'profile') {
+                _navigateToProfile(context);
+              }
+            },
+            itemBuilder: (BuildContext context) => [
+              const PopupMenuItem<String>(
+                value: 'profile',
+                child: Text('Edit Profile'),
+              ),
+              const PopupMenuItem<String>(
+                value: 'logout',
+                child: Text('Logout'),
+              ),
+            ],
+          ),
         ],
       ),
       body: SafeArea(
@@ -45,7 +67,7 @@ class HomeDashboardScreen extends StatelessWidget {
                   // Search Bar
                   _buildSearchBar(theme, context),
                   const SizedBox(height: 32),
-                  
+
                   // Tips Section
                   _buildSectionHeader(
                     context: context,
@@ -55,11 +77,12 @@ class HomeDashboardScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildTipCard(
                     title: 'How to Ace Your Next Interview',
-                    content: 'Learn the top strategies to impress your interviewers',
+                    content:
+                        'Learn the top strategies to impress your interviewers',
                     onTap: () => _showTipDetail(context, 'Interview Tips'),
                   ),
                   const SizedBox(height: 32),
-                  
+
                   // Job Recommendations
                   _buildSectionHeader(
                     context: context,
@@ -67,11 +90,11 @@ class HomeDashboardScreen extends StatelessWidget {
                     onSeeAll: () => _navigateToAllJobs(context),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Job Category Tabs
                   _buildCategoryTabs(jobCategories, primaryColor),
                   const SizedBox(height: 24),
-                  
+
                   // Job Listings
                   _buildJobListing(
                     company: 'AirBNB',
@@ -98,7 +121,92 @@ class HomeDashboardScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomNavigationBar(primaryColor, secondaryColor),
+      bottomNavigationBar:
+          _buildBottomNavigationBar(primaryColor, secondaryColor, context),
+    );
+  }
+
+  // Add logout functionality
+  void _logout(BuildContext context) async {
+    // Show confirmation dialog
+    final shouldLogout = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Logout'),
+          content: const Text('Are you sure you want to logout?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('Logout'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (shouldLogout == true) {
+      // Clear the profile flag
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('hasProfile', false);
+
+      // Navigate back to home screen
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+        (route) => false,
+      );
+    }
+  }
+
+  void _navigateToProfile(BuildContext context) {
+    // Navigate to profile editing screen
+    Navigator.pushNamed(
+      context,
+      '/profile-creation',
+      arguments: jobCategories, // Pass current categories for editing
+    );
+  }
+
+  // Update the bottom navigation bar to include logout
+  Widget _buildBottomNavigationBar(
+      Color primaryColor, Color secondaryColor, BuildContext context) {
+    return BottomNavigationBar(
+      type: BottomNavigationBarType.fixed,
+      selectedItemColor: primaryColor,
+      unselectedItemColor: secondaryColor,
+      onTap: (index) {
+        if (index == 4) {
+          // Assuming we add a logout button as the 5th item
+          _logout(context);
+        }
+      },
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home),
+          label: 'Home',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.search),
+          label: 'Search',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.bookmark_border),
+          label: 'Saved',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          label: 'Profile',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.logout),
+          label: 'Logout',
+        ),
+      ],
     );
   }
 
@@ -197,9 +305,10 @@ class HomeDashboardScreen extends StatelessWidget {
       child: Row(
         children: [
           _buildCategoryTab('All Jobs', true, primaryColor),
-          ...categories.map((category) => 
-            _buildCategoryTab(category, false, primaryColor)
-          ).toList(),
+          ...categories
+              .map((category) =>
+                  _buildCategoryTab(category, false, primaryColor))
+              .toList(),
         ],
       ),
     );
@@ -285,37 +394,12 @@ class HomeDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigationBar(Color primaryColor, Color secondaryColor) {
-    return BottomNavigationBar(
-      type: BottomNavigationBarType.fixed,
-      selectedItemColor: primaryColor,
-      unselectedItemColor: secondaryColor,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home),
-          label: 'Home',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.search),
-          label: 'Search',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.bookmark_border),
-          label: 'Saved',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          label: 'Profile',
-        ),
-      ],
-    );
-  }
-
   void _showNotifications(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => const Placeholder(), // Replace with notifications screen
+        builder: (context) =>
+            const Placeholder(), // Replace with notifications screen
       ),
     );
   }
@@ -341,7 +425,8 @@ class HomeDashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(tipTitle),
-        content: const Text('Detailed content about this tip would appear here.'),
+        content:
+            const Text('Detailed content about this tip would appear here.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -366,7 +451,8 @@ class HomeDashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(jobTitle),
-        content: const Text('Detailed information about this job would appear here.'),
+        content: const Text(
+            'Detailed information about this job would appear here.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
