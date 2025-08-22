@@ -33,10 +33,7 @@ class _SignInScreenState extends State<SignInScreen> {
       });
 
       if (_emailError == null && _passwordError == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sign In Successful! (Simulation)')),
-        );
-        Navigator.pushReplacementNamed(context, '/home');
+          Navigator.pushReplacementNamed(context, '/home');
         // Navigator.pushReplacementNamed(context, '/home');
       }
     }
@@ -76,7 +73,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     TextFormField(
                       decoration: InputDecoration(
                         labelText: 'Email',
-                        hintText: 'example@yourdomain.com',
+                        hintText: 'Karma@gmail.com',
                         prefixIcon: Icon(Icons.email_outlined, color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
                         errorText: _emailError,
                       ),

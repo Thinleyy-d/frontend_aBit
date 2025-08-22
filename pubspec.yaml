@@ -32,3 +32,7 @@ flutter:
     - assets/sample_photo_1.png
     - assets/sample_photo_2.png
     - assets/twitter_logo.png
+    - assets/default_logo.png
+    - assets/default_profile.png
+    - assets/background.jpg
+    - assets/background1.jpg

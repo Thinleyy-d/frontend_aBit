@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -12,34 +11,62 @@ class HomeScreen extends StatelessWidget {
     final Color lightPrimary = const Color(0xFFEDF2FF);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            child: Container(
-              width: isWideScreen ? 430 : double.infinity,
-              padding: EdgeInsets.symmetric(
-                horizontal: isWideScreen ? 20 : 24,
-                vertical: 32,
+      body: Stack(
+        children: [
+          // Background Image
+          Container(
+            decoration: const BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/background.jpg'), // Replace with your image path
+                fit: BoxFit.cover,
               ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Logo Section
-                  _buildLogoSection(primaryColor),
-                  const SizedBox(height: 24),
-                  
-                  // App Title
-                  _buildAppTitle(primaryColor),
-                  const SizedBox(height: 60),
-                  
-                  // Action Card
-                  _buildActionCard(context, primaryColor, lightPrimary, theme),
+            ),
+          ),
+          
+          // Gradient Overlay for better readability
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.1),
+                  Colors.black.withOpacity(0.3),
                 ],
               ),
             ),
           ),
-        ),
+
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  width: isWideScreen ? 430 : double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isWideScreen ? 20 : 24,
+                    vertical: 32,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Logo Section
+                      _buildLogoSection(primaryColor),
+                      const SizedBox(height: 24),
+                      
+                      // App Title
+                      _buildAppTitle(primaryColor),
+                      const SizedBox(height: 60),
+                      
+                      // Action Card
+                      _buildActionCard(context, primaryColor, lightPrimary, theme),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -47,11 +74,11 @@ class HomeScreen extends StatelessWidget {
   Widget _buildLogoSection(Color primaryColor) {
     return Container(
       decoration: BoxDecoration(
-        color: primaryColor,
+        color: Colors.white.withOpacity(0.9),
         borderRadius: BorderRadius.circular(36),
         boxShadow: [
           BoxShadow(
-            color: primaryColor.withOpacity(0.2),
+            color: primaryColor.withOpacity(0.3),
             blurRadius: 15,
             spreadRadius: 2,
           ),
@@ -68,13 +95,20 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildAppTitle(Color primaryColor) {
-    return const Text(
+    return Text(
       'Gokab',
       style: TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: 32,
-        color: Color(0xFF4C7DFF),
+        color: Colors.white, // Changed to white for better contrast
         letterSpacing: 1.2,
+        shadows: [
+          Shadow(
+            color: Colors.black.withOpacity(0.3),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
     );
   }
@@ -82,15 +116,19 @@ class HomeScreen extends StatelessWidget {
   Widget _buildActionCard(BuildContext context, Color primaryColor, Color lightPrimary, ThemeData theme) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.white.withOpacity(0.95),
         borderRadius: BorderRadius.circular(32),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
-            blurRadius: 20,
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 25,
             offset: const Offset(0, 10),
           ),
         ],
+        border: Border.all(
+          color: Colors.white.withOpacity(0.5),
+          width: 1,
+        ),
       ),
       padding: const EdgeInsets.symmetric(
         vertical: 32,
@@ -105,7 +143,7 @@ class HomeScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: primaryColor.withOpacity(0.1),
+                  color: primaryColor.withOpacity(0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -126,6 +164,7 @@ class HomeScreen extends StatelessWidget {
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.bold,
               color: Colors.black87,
+              fontSize: 18,
             ),
             textAlign: TextAlign.center,
           ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 // Screen Imports
 import 'screens/splash_screen.dart';
 import 'screens/sign_in_screen.dart';
-import 'screens/sign_up_screen.dart';
+import 'screens/sign_up_screen.dart' as sign_up; // Use prefix to avoid conflict
 import 'screens/account_success_screen.dart';
 import 'screens/forgot_password_screen.dart';
 import 'screens/otp_verification_screen.dart';
@@ -68,7 +68,8 @@ class GaweanJobPortal extends StatelessWidget {
     return InputDecorationTheme(
       filled: true,
       fillColor: Colors.white,
-      contentPadding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+      contentPadding:
+          const EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
       border: OutlineInputBorder(
         borderRadius: BorderRadius.circular(12.0),
         borderSide: const BorderSide(color: Color(0xFFE0E0E0), width: 1.0),
@@ -150,9 +151,9 @@ class GaweanJobPortal extends StatelessWidget {
       case '/splash':
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case '/landing':
-        return MaterialPageRoute(builder: (_) => const SignInScreen());
+        return MaterialPageRoute(builder: (_) => SignInScreen()); // Removed const
       case '/signup':
-        return MaterialPageRoute(builder: (_) => const SignUpScreen());
+        return MaterialPageRoute(builder: (_) => sign_up.SignUpScreen()); // Use prefix and removed const
       case '/forgot_password':
         return MaterialPageRoute(builder: (_) => const ForgotPasswordScreen());
       case '/otp_verification':
@@ -177,10 +178,14 @@ class GaweanJobPortal extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => const HomeScreen());
       case '/job_category':
         return MaterialPageRoute(builder: (_) => const JobCategoryScreen());
+      case '/signin':
+        return MaterialPageRoute(builder: (_) => SignInScreen()); // Removed const
       case '/employer_dashboard':
-        return MaterialPageRoute(builder: (_) => const EmployerDashboardScreen());
+        return MaterialPageRoute(
+            builder: (_) => const EmployerDashboardScreen());
       case '/organization_profile_form':
-        return MaterialPageRoute(builder: (_) => const OrganizationProfileFormScreen());
+        return MaterialPageRoute(
+            builder: (_) => const OrganizationProfileFormScreen());
       case '/applications':
         return MaterialPageRoute(builder: (_) => const ApplicationsScreen());
       case '/logo_upload':

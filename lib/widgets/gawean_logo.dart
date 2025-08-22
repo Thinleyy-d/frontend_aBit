@@ -10,6 +10,7 @@ class GaweanLogo extends StatelessWidget {
     this.iconSize = 64.0,
     this.fontSize = 28.0,
     this.tagline,
+    
   });
 
   @override

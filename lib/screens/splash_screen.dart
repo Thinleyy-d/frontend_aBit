@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../widgets/gawean_logo.dart';
-import '../widgets/gradient_background.dart';
 import '../helpers/shared_preferences_helper.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -13,6 +12,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   bool _showContinueButton = false;
   bool _isLoading = true;
+  bool _imageError = false;
 
   @override
   void initState() {
@@ -34,10 +34,13 @@ class _SplashScreenState extends State<SplashScreen> {
       await _showWelcomeAnimation();
       await SharedPreferencesHelper.setFirstLaunchComplete();
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/landing');
+      setState(() {
+        _isLoading = false;
+        _showContinueButton = true;
+      });
     } else if (token != null) {
       Navigator.pushReplacementNamed(context, '/home-dashboard', arguments: {
-        'name': 'User', // Replace with actual user name
+        'name': 'User',
         'jobCategories': ['All', 'Design', 'Development', 'Marketing'],
       });
     } else {
@@ -54,47 +57,120 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return GradientBackground(
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        body: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Spacer(flex: 2),
-                    const GaweanLogo(
-                      iconSize: 100,
-                      fontSize: 36,
-                      tagline: 'The best portal job of this century',
-                    ),
-                    const Spacer(flex: 3),
-                    _buildBottomContent(),
-                  ],
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background Image with error handling
+          _buildBackground(),
+          
+          // Gradient Overlay for better readability
+          Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withOpacity(0.6),
+                  Colors.black.withOpacity(0.3),
+                  Colors.black.withOpacity(0.6),
+                ],
+              ),
+            ),
+          ),
+
+          SafeArea(
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Spacer(flex: 2),
+                      DefaultTextStyle(
+                        style: const TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+                        child: const GaweanLogo(
+                          iconSize: 100,
+                          fontSize: 36,
+                          tagline: 'The best portal job of this century',
+                        ),
+                      ),
+                      const Spacer(flex: 3),
+                      _buildBottomContent(),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
 
+  Widget _buildBackground() {
+    try {
+      return Image.asset(
+        'assets/background1.jpg',
+        fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+        errorBuilder: (context, error, stackTrace) {
+          // If image fails to load, show a gradient background instead
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  const Color(0xFF4C7DFF),
+                  const Color(0xFF8EACFE),
+                  const Color(0xFFC7D3FC),
+                ],
+              ),
+            ),
+          );
+        },
+      );
+    } catch (e) {
+      // Fallback gradient background if asset loading fails
+      return Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              const Color(0xFF4C7DFF),
+              const Color(0xFF8EACFE),
+              const Color(0xFFC7D3FC),
+            ],
+          ),
+        ),
+      );
+    }
+  }
+
   Widget _buildBottomContent() {
     if (_isLoading) {
-      return const Column(
+      return Column(
         children: [
-          CircularProgressIndicator(
+          const CircularProgressIndicator(
             valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16), 
           Text(
             'Loading...',
-            style: TextStyle(color: Colors.white),
+            style: TextStyle(
+              color: Colors.white,
+              shadows: [
+                Shadow(
+                  color: Colors.black.withOpacity(0.5),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
           ),
         ],
       );
@@ -111,11 +187,13 @@ class _SplashScreenState extends State<SplashScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
-                    foregroundColor: Colors.blue,
+                    foregroundColor: const Color.fromARGB(255, 0, 0, 0),
                     minimumSize: const Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
+                    elevation: 4,
+                    shadowColor: Colors.black.withOpacity(0.3),
                   ),
                   child: const Text(
                     'Continue',
@@ -130,12 +208,19 @@ class _SplashScreenState extends State<SplashScreen> {
                   onPressed: () {
                     Navigator.pushReplacementNamed(context, '/signup');
                   },
-                  child: const Text(
+                  child: Text(
                     'Create New Account',
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black.withOpacity(0.5),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
                     ),
                   ),
                 ),
