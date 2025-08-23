@@ -3,6 +3,116 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:shared_preferences/shared_preferences.dart';
 
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Image Picker Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: const ImagePickerScreen(),
+    );
+  }
+}
+
+class ImagePickerScreen extends StatefulWidget {
+  const ImagePickerScreen({super.key});
+
+  @override
+  _ImagePickerScreenState createState() => _ImagePickerScreenState();
+}
+
+class _ImagePickerScreenState extends State<ImagePickerScreen> {
+  // A variable to hold the selected image file. It is nullable because
+  // there might not be an image selected.
+  File? _selectedImage;
+
+  // An instance of the ImagePicker plugin.
+  final ImagePicker _picker = ImagePicker();
+
+  // Function to handle picking an image from the gallery.
+  Future<void> _pickImage() async {
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      // If a file was picked, update the state to display it.
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+    }
+  }
+
+  // Function to "delete" the image by clearing the state.
+  void _deleteImage() {
+    setState(() {
+      _selectedImage = null;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Upload and Delete Pic'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            // Display the selected image or a placeholder.
+            CircleAvatar(
+              radius: 80,
+              backgroundColor: Colors.grey[300],
+              child: _selectedImage != null
+                  ? ClipOval(
+                      child: Image.file(
+                        _selectedImage!,
+                        fit: BoxFit.cover,
+                        width: 160,
+                        height: 160,
+                      ),
+                    )
+                  : const Icon(
+                      Icons.person,
+                      size: 80,
+                      color: Colors.grey,
+                    ),
+            ),
+            const SizedBox(height: 20),
+            // "Upload" Button:
+            // This button is always visible to allow picking a new image.
+            ElevatedButton.icon(
+              onPressed: _pickImage,
+              icon: const Icon(Icons.add_a_photo),
+              label: Text(_selectedImage == null ? 'Upload Profile Pic' : 'Change Profile Pic'),
+            ),
+            // "Delete" Button:
+            // This button is only visible when an image has been selected.
+            if (_selectedImage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 10.0),
+                child: TextButton.icon(
+                  onPressed: _deleteImage,
+                  icon: const Icon(Icons.delete, color: Colors.red),
+                  label: const Text(
+                    'Delete Picture',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
 class ProfileCreationScreen extends StatefulWidget {
   final List<String> selectedJobCategories;
@@ -25,32 +135,15 @@ class _ProfileCreationScreenState extends State<ProfileCreationScreen> {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _occupationController = TextEditingController();
   bool _isLoading = false;
+  final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickProfileImage() async {
-    setState(() => _isLoading = true);
-    try {
-      final pickedFile = await ImagePicker().pickImage(
-        source: ImageSource.gallery,
-        maxWidth: 800,
-        maxHeight: 800,
-        imageQuality: 85,
-      );
-      if (pickedFile != null && mounted) {
-        setState(() => _profileImage = File(pickedFile.path));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Failed to pick image: ${e.toString()}'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+    final XFile? pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    
+    if (pickedFile != null) {
+      setState(() {
+        _profileImage = File(pickedFile.path);
+      });
     }
   }
 

@@ -17,6 +17,7 @@ import 'screens/logo_upload_screen.dart';
 import 'screens/application_screen.dart';
 import 'screens/profile_creation_screen.dart';
 import 'screens/home_dashboard_screen.dart';
+import 'screens/create_vacancy_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -184,6 +185,8 @@ class GaweanJobPortal extends StatelessWidget {
         return MaterialPageRoute(builder: (_) => const AccountSuccessScreen());
       case '/home':
         return MaterialPageRoute(builder: (_) => const HomeScreen());
+      case '/CreateVacancy':
+        return MaterialPageRoute(builder: (_) => const CreateVacanciesScreen());
       case '/job_category':
         return MaterialPageRoute(builder: (_) => const JobCategoryScreen());
       case '/signin':

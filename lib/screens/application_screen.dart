@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:job_portal_ui/screens/create_vacancy_screen.dart';
 
 
 class ApplicationsScreen extends StatelessWidget {
@@ -16,8 +17,9 @@ class ApplicationsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _navigateToCreateVacancy(context),
-            tooltip: 'Create Vacancy',
+            onPressed: ()
+                => Navigator.pushNamed(context, '/CreateVacancy'),
+            tooltip: 'CreateVacancy',
           ),
         ],
       ),
@@ -167,17 +169,18 @@ class ApplicationsScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              onPressed: () => _navigateToCreateVacancy(context),
+              onPressed: ()
+                  => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const CreateVacanciesScreen(),
+                        ),
+                      ),
             ),
           ],
         ),
       ),
     );
-  }
-
-  void _navigateToCreateVacancy(BuildContext context) {
-    // Implement navigation to create vacancy screen
-    // Navigator.push(context, MaterialPageRoute(builder: ...));
   }
 
   void _handleFilterSelection(String value) {
