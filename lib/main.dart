@@ -18,6 +18,9 @@ import 'screens/application_screen.dart';
 import 'screens/profile_creation_screen.dart';
 import 'screens/home_dashboard_screen.dart';
 import 'screens/create_vacancy_screen.dart';
+import 'screens/requirements_screen.dart';
+import 'screens/requirements_selection_screen.dart';
+import 'screens/job_vacancy_posted_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -217,6 +220,22 @@ class GaweanJobPortal extends StatelessWidget {
             jobCategories: args['jobCategories'] ?? [],
           ),
         );
+      
+      // New dynamic routes for vacancy creation flow
+      case '/requirements':
+        final args = settings.arguments as Map<String, dynamic>?;
+        return MaterialPageRoute(
+          builder: (_) => RequirementsScreen(jobData: args),
+        );
+      case '/requirements_selection':
+        return MaterialPageRoute(
+          builder: (_) => const RequirementsSelectionScreen(),
+        );
+      case '/job_posted':
+        return MaterialPageRoute(
+          builder: (_) => const JobVacancyPostedScreen(),
+        );
+        
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(
@@ -226,5 +245,27 @@ class GaweanJobPortal extends StatelessWidget {
           ),
         );
     }
+  }
+}
+
+// Requirement Model (should be in a separate file, but added here for completeness)
+class Requirement {
+  final String text;
+  bool isChecked;
+
+  Requirement({required this.text, required this.isChecked});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'text': text,
+      'isChecked': isChecked,
+    };
+  }
+
+  factory Requirement.fromMap(Map<String, dynamic> map) {
+    return Requirement(
+      text: map['text'] ?? '',
+      isChecked: map['isChecked'] ?? false,
+    );
   }
 }

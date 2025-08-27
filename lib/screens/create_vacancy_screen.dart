@@ -407,37 +407,45 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
 
               // Next Button
               Center(
-                child: SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Add button press logic here
-                      // You can now access the form data using the controllers and variables
-                      debugPrint('Position: ${_positionController.text}');
-                      debugPrint('Salary: ${_getCurrencySymbol()}${_salaryController.text} $_selectedCurrency');
-                      debugPrint('Location: ${_locationController.text}');
-                      debugPrint('Type: $_selectedType');
-                      debugPrint('Logo uploaded: ${_selectedImage != null}');
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF75A9F9),
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: const Text(
-                      'Next',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+  child: SizedBox(
+    width: double.infinity,
+    height: 50,
+    child: ElevatedButton(
+      onPressed: () {
+        // Collect all form data
+        final jobData = {
+          'position': _positionController.text,
+          'salary': '${_getCurrencySymbol()}${_salaryController.text} $_selectedCurrency',
+          'location': _locationController.text,
+          'type': _selectedType,
+          'company': 'AirBNB',
+          'logo': _selectedImage?.path,
+        };
+
+        Navigator.pushNamed(
+          context,
+          '/requirements',
+          arguments: jobData,
+        );
+      },
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFF75A9F9),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 5,
+      ),
+      child: const Text(
+        'Next',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+  ),
+),
             ],
           ),
         ),

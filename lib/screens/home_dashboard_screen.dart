@@ -70,26 +70,33 @@ class HomeDashboardScreen extends StatelessWidget {
 
                   // Tips Section
                   _buildSectionHeader(
-                    context: context,
-                    title: 'Career Tips for You',
-                    onSeeAll: () => _navigateToTips(context),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildTipCard(
-                    title: 'How to Ace Your Next Interview',
-                    content:
-                        'Learn the top strategies to impress your interviewers',
-                    onTap: () => _showTipDetail(context, 'Interview Tips'),
-                  ),
-                  const SizedBox(height: 32),
-
-                  // Job Recommendations
-                  _buildSectionHeader(
-                    context: context,
-                    title: 'Personalized Job Recommendations',
-                    onSeeAll: () => _navigateToAllJobs(context),
-                  ),
-                  const SizedBox(height: 16),
+  context: context,
+  title: 'Career Tips for You',
+  onSeeAll: () => _navigateToTips(context),
+),
+const SizedBox(height: 16),
+Container(
+  decoration: BoxDecoration(
+    image: DecorationImage(
+      image: AssetImage('assets/career_tips_bg.jpg'), // Make sure this path is correct
+      fit: BoxFit.cover,
+      colorFilter: ColorFilter.mode(
+        Colors.transparent,
+        BlendMode.darken,
+      ),
+    ),
+    borderRadius: BorderRadius.circular(12),
+  ),
+  child: ClipRRect(
+    borderRadius: BorderRadius.circular(12),
+    child: _buildTipCard(
+      title: 'How to Ace Your Next Interview',
+      content: 'Learn the top strategies to impress your interviewers',
+      onTap: () => _showTipDetail(context, 'Interview Tips'),
+    ),
+  ),
+),
+const SizedBox(height: 32),
 
                   // Job Category Tabs
                   _buildCategoryTabs(jobCategories, primaryColor),
@@ -288,8 +295,8 @@ class HomeDashboardScreen extends StatelessWidget {
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
-                  onPressed: onTap,
-                  child: const Text('Read More'),
+                  onPressed: onTap, 
+                  child: const Text('Read More'), 
                 ),
               ),
             ],

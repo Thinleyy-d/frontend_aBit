@@ -12,7 +12,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
   bool _showContinueButton = false;
   bool _isLoading = true;
-  
+  bool _imageError = false;
 
   @override
   void initState() {

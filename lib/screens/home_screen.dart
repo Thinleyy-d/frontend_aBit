@@ -18,7 +18,7 @@ class HomeScreen extends StatelessWidget {
           Container(
             decoration: const BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/background.jpg'), // Replace with your image path
+                image: AssetImage('assets/minimalist_bg.png'), // Replace with your image path
                 fit: BoxFit.cover,
               ),
             ),
@@ -32,9 +32,9 @@ class HomeScreen extends StatelessWidget {
                 end: Alignment.bottomCenter,
                 colors: [
                   const Color(0xFFE0F7FA).withOpacity(0.5),
-                  const Color(0xFF00BFFF).withOpacity(0.6),
+                  const Color.fromARGB(255, 60, 124, 146).withOpacity(0.6),
                   const Color(0xFF81D4FA).withOpacity(0.7),
-                  const Color(0xFFFFFFFF).withOpacity(0.8),
+                  const Color.fromARGB(255, 224, 220, 220).withOpacity(0.8),
                 ],
               ),
             ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:job_portal_ui/screens/create_vacancy_screen.dart';
 
-
 class ApplicationsScreen extends StatelessWidget {
   const ApplicationsScreen({super.key});
 
@@ -14,33 +13,47 @@ class ApplicationsScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Applications'),
         centerTitle: true,
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: ()
-                => Navigator.pushNamed(context, '/CreateVacancy'),
+            onPressed: () => Navigator.pushNamed(context, '/CreateVacancy'),
             tooltip: 'CreateVacancy',
           ),
         ],
       ),
-      body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 1200),
-            child: Padding(
-              padding: EdgeInsets.all(isLargeScreen ? 24.0 : 16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Search and Filter Row
-                  _buildSearchFilterRow(theme, isLargeScreen),
-                  const SizedBox(height: 24),
-                  
-                  // Content Section
-                  Expanded(
-                    child: _buildContentSection(theme, context),
-                  ),
-                ],
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/minimalist_bg.png'), // Your minimalist background image
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              Colors.white.withOpacity(0.95), // Light overlay to maintain readability
+              BlendMode.dstOver,
+            ),
+          ),
+        ),
+        child: SafeArea(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 1200),
+              child: Padding(
+                padding: EdgeInsets.all(isLargeScreen ? 24.0 : 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Search and Filter Row
+                    _buildSearchFilterRow(theme, isLargeScreen),
+                    const SizedBox(height: 24),
+                    
+                    // Content Section
+                    Expanded(
+                      child: _buildContentSection(theme, context),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -50,30 +63,39 @@ class ApplicationsScreen extends StatelessWidget {
   }
 
   Widget _buildSearchFilterRow(ThemeData theme, bool isLargeScreen) {
-    return Row(
-      children: [
-        Expanded(
-          child: TextField(
-            decoration: InputDecoration(
-              hintText: 'Search applications...',
-              prefixIcon: const Icon(Icons.search),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: theme.dividerColor),
-              ),
-              filled: true,
-              fillColor: theme.cardColor,
-              contentPadding: EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: isLargeScreen ? 16 : 12
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search applications...',
+                prefixIcon: const Icon(Icons.search),
+                border: InputBorder.none,
+                filled: false,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: isLargeScreen ? 16 : 12,
                 ),
+              ),
             ),
           ),
-        ),
-        if (isLargeScreen) const SizedBox(width: 16),
-        if (!isLargeScreen) const Spacer(),
-        _buildFilterDropdown(theme),
-      ],
+          if (isLargeScreen) const SizedBox(width: 16),
+          if (!isLargeScreen) const Spacer(),
+          _buildFilterDropdown(theme),
+        ],
+      ),
     );
   }
 
@@ -101,8 +123,8 @@ class ApplicationsScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: theme.cardColor,
-          border: Border.all(color: theme.dividerColor),
+          color: Colors.white.withOpacity(0.9),
+          border: Border.all(color: Colors.grey.shade200),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
@@ -125,27 +147,39 @@ class ApplicationsScreen extends StatelessWidget {
   }
 
   Widget _buildContentSection(ThemeData theme, BuildContext context) {
-    
     return _buildEmptyState(theme, context);
   }
 
   Widget _buildEmptyState(ThemeData theme, BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.85),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      margin: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(32),
+      child: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
               Icons.assignment_outlined,
               size: 80,
-              color: theme.disabledColor,
+              color: Colors.grey.shade400,
             ),
             const SizedBox(height: 24),
             Text(
               'No applications yet',
               style: theme.textTheme.headlineSmall?.copyWith(
                 fontWeight: FontWeight.bold,
+                color: Colors.grey.shade800,
               ),
             ),
             const SizedBox(height: 12),
@@ -153,7 +187,7 @@ class ApplicationsScreen extends StatelessWidget {
               'When candidates apply to your vacancies, you\'ll see their applications here.',
               textAlign: TextAlign.center,
               style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.hintColor,
+                color: Colors.grey.shade600,
               ),
             ),
             const SizedBox(height: 32),
@@ -161,6 +195,8 @@ class ApplicationsScreen extends StatelessWidget {
               icon: const Icon(Icons.add),
               label: const Text('Create Vacancy'),
               style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF4C7DFF),
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                   horizontal: 32,
                   vertical: 16,
@@ -168,14 +204,14 @@ class ApplicationsScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+                elevation: 3,
               ),
-              onPressed: ()
-                  => Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CreateVacanciesScreen(),
-                        ),
-                      ),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CreateVacanciesScreen(),
+                ),
+              ),
             ),
           ],
         ),
@@ -185,7 +221,5 @@ class ApplicationsScreen extends StatelessWidget {
 
   void _handleFilterSelection(String value) {
     // Implement filter logic
-    // setState if using StatefulWidget
   }
-  
 }

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class EmployerDashboardScreen extends StatelessWidget {
   const EmployerDashboardScreen({super.key});
 
@@ -43,7 +42,7 @@ class EmployerDashboardScreen extends StatelessWidget {
                   const Spacer(),
                   
                   // Bottom Navigation
-                  _buildBottomNavigation(primaryColor, secondaryText),
+                  _buildBottomNavigation(context, primaryColor, secondaryText),
                 ],
               ),
             ),
@@ -391,7 +390,7 @@ class EmployerDashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomNavigation(Color primaryColor, Color secondaryText) {
+  Widget _buildBottomNavigation(BuildContext context, Color primaryColor, Color secondaryText) {
     return Container(
       decoration: BoxDecoration(
         color: const Color(0xFFF9FAFF),
@@ -408,27 +407,34 @@ class EmployerDashboardScreen extends StatelessWidget {
             isActive: true,
             activeColor: primaryColor,
             inactiveColor: secondaryText,
+            onTap: () {}, // Keep existing functionality
           ),
           _buildBottomNavItem(
             icon: Icons.list_alt, 
-            label: '', 
+            label: 'Search', 
             isActive: false,
             activeColor: primaryColor,
             inactiveColor: secondaryText,
+            onTap: () {}, // Keep existing functionality
           ),
           _buildBottomNavItem(
             icon: Icons.chat_bubble_outline, 
-            label: '', 
+            label: 'Saved', 
             isActive: false,
             activeColor: primaryColor,
             inactiveColor: secondaryText,
+            onTap: () {}, // Keep existing functionality
           ),
           _buildBottomNavItem(
             icon: Icons.person, 
-            label: '', 
+            label: 'Profile', 
             isActive: false,
             activeColor: primaryColor,
             inactiveColor: secondaryText,
+            onTap: () {
+              // Navigate to profile page
+              Navigator.of(context).pushNamed('/profile_creation_screen');
+            },
           ),
         ],
       ),
@@ -441,25 +447,29 @@ class EmployerDashboardScreen extends StatelessWidget {
     required bool isActive,
     required Color activeColor,
     required Color inactiveColor,
+    required VoidCallback onTap,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon, 
-          color: isActive ? activeColor : inactiveColor, 
-          size: 28,
-        ),
-        if (label.isNotEmpty)
-          Text(
-            label,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isActive ? activeColor : inactiveColor,
-              fontSize: 12,
-            ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon, 
+            color: isActive ? activeColor : inactiveColor, 
+            size: 28,
           ),
-      ],
+          if (label.isNotEmpty)
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isActive ? activeColor : inactiveColor,
+                fontSize: 12,
+              ),
+            ),
+        ],
+      ),
     );
   }
 }
