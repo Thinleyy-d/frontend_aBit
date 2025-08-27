@@ -18,7 +18,6 @@ import 'screens/application_screen.dart';
 import 'screens/profile_creation_screen.dart';
 import 'screens/home_dashboard_screen.dart';
 import 'screens/create_vacancy_screen.dart';
-import 'screens/requirements_screen.dart';
 import 'screens/requirements_selection_screen.dart';
 import 'screens/job_vacancy_posted_screen.dart';
 
@@ -221,12 +220,7 @@ class GaweanJobPortal extends StatelessWidget {
           ),
         );
       
-      // New dynamic routes for vacancy creation flow
-      case '/requirements':
-        final args = settings.arguments as Map<String, dynamic>?;
-        return MaterialPageRoute(
-          builder: (_) => RequirementsScreen(jobData: args),
-        );
+      // New dynamic routes for vacancy creation flo
       case '/requirements_selection':
         return MaterialPageRoute(
           builder: (_) => const RequirementsSelectionScreen(),

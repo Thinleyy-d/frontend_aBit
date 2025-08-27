@@ -69,14 +69,27 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
             const Divider(),
             const SizedBox(height: 16),
             
-            GestureDetector(
-              onTap: _addNewRequirement,
-              child: const Text(
-                'Add New Requirements',
-                style: TextStyle(
+            Center(
+              child: OutlinedButton.icon(
+                onPressed: _addNewRequirement,
+                icon: const Icon(
+                  Icons.add,
                   color: Color(0xFF4C7DFF),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                ),
+                label: const Text(
+                  'Add New Requirements',
+                  style: TextStyle(
+                    color: Color(0xFF4C7DFF),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                style: OutlinedButton.styleFrom(
+                  side: const BorderSide(color: Color(0xFF4C7DFF), width: 2),
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
               ),
             ),
@@ -129,12 +142,16 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
   }
 
   void _addNewRequirement() {
+    final TextEditingController controller = TextEditingController();
+    
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Add New Requirement'),
         content: TextField(
+          controller: controller,
           decoration: const InputDecoration(hintText: 'Enter requirement...'),
+          autofocus: true,
           onSubmitted: (value) {
             if (value.isNotEmpty) {
               setState(() {
@@ -150,7 +167,15 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
             child: const Text('Cancel'),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () {
+              final text = controller.text.trim();
+              if (text.isNotEmpty) {
+                setState(() {
+                  _requirements.add(Requirement(text: text, isChecked: false));
+                });
+                Navigator.pop(context);
+              }
+            },
             child: const Text('Add'),
           ),
         ],

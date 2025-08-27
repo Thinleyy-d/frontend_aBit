@@ -424,7 +424,7 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
 
         Navigator.pushNamed(
           context,
-          '/requirements',
+          '/requirements_selection',
           arguments: jobData,
         );
       },
