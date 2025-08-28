@@ -14,7 +14,6 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
   final TextEditingController _positionController = TextEditingController();
   final TextEditingController _salaryController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
   final TextEditingController _companyController = TextEditingController();
 
   // Variables to hold the dropdown values
@@ -51,7 +50,6 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
     _positionController.dispose();
     _salaryController.dispose();
     _locationController.dispose();
-    _descriptionController.dispose();
     _companyController.dispose();
     super.dispose();
   }
@@ -402,21 +400,6 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Job Description Field
-                const Text(
-                  'Job Description',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _descriptionController,
-                  maxLines: 4,
-                  decoration: const InputDecoration(
-                    hintText: 'Describe the job responsibilities and requirements...',
-                  ),
-                ),
-                const SizedBox(height: 20),
-
                 // Type Dropdown
                 const Text(
                   'Type*',
@@ -458,7 +441,7 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
                   ),
                 const SizedBox(height: 40),
 
-                // Next Button - FIXED NAVIGATION
+                // Next Button
                 Center(
                   child: SizedBox(
                     width: double.infinity,
@@ -475,7 +458,6 @@ class _CreateVacanciesScreenState extends State<CreateVacanciesScreen> {
                             'company': _companyController.text.isNotEmpty 
                                 ? _companyController.text 
                                 : 'AirBNB',
-                            'description': _descriptionController.text,
                             'logo': _selectedImage?.path,
                           };
 

@@ -110,35 +110,6 @@ class JobVacancyPostedScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
-                  
-                  // Salary (full width)
-                  _buildHorizontalDetailItem(
-                    icon: Icons.attach_money,
-                    title: 'Salary',
-                    value: jobData['salary'] ?? 'Not specified',
-                  ),
-                  
-                  // Job Description
-                  if (jobData['description'] != null && jobData['description'].toString().isNotEmpty)
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Job Description',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          jobData['description'],
-                          style: const TextStyle(fontSize: 16, color: Colors.black87),
-                        ),
-                      ],
-                    ),
                 ],
               ),
             ),

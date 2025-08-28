@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class HomeDashboardScreen extends StatelessWidget {
+class HomeDashboardScreen extends StatefulWidget {
   final String name;
   final List<String> jobCategories;
 
@@ -12,6 +12,13 @@ class HomeDashboardScreen extends StatelessWidget {
   });
 
   @override
+  State<HomeDashboardScreen> createState() => _HomeDashboardScreenState();
+}
+
+class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
+  int _currentIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
     final ThemeData theme = Theme.of(context);
     final bool isLargeScreen = MediaQuery.of(context).size.width > 600;
@@ -20,7 +27,7 @@ class HomeDashboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome back, $name!', style: theme.textTheme.titleLarge),
+        title: Text('Welcome back, ${widget.name}!', style: theme.textTheme.titleLarge),
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications_outlined),
@@ -70,66 +77,93 @@ class HomeDashboardScreen extends StatelessWidget {
 
                   // Tips Section
                   _buildSectionHeader(
-  context: context,
-  title: 'Career Tips for You',
-  onSeeAll: () => _navigateToTips(context),
-),
-const SizedBox(height: 16),
-Container(
-  decoration: BoxDecoration(
-    image: DecorationImage(
-      image: AssetImage('assets/career_tips_bg.jpg'), // Make sure this path is correct
-      fit: BoxFit.cover,
-      colorFilter: ColorFilter.mode(
-        Colors.transparent,
-        BlendMode.darken,
-      ),
-    ),
-    borderRadius: BorderRadius.circular(12),
-  ),
-  child: ClipRRect(
-    borderRadius: BorderRadius.circular(12),
-    child: _buildTipCard(
-      title: 'How to Ace Your Next Interview',
-      content: 'Learn the top strategies to impress your interviewers',
-      onTap: () => _showTipDetail(context, 'Interview Tips'),
-    ),
-  ),
-),
-const SizedBox(height: 32),
-
-                  // Job Category Tabs
-                  _buildCategoryTabs(jobCategories, primaryColor),
-                  const SizedBox(height: 24),
-
-                  // Job Listings
-                  _buildJobListing(
-                    company: 'AirBNB',
-                    position: 'UI/UX Designer',
-                    location: 'United States',
-                    type: 'Full Time',
-                    salary: '\$2,350',
-                    logo: 'assets/airbnb_logo.png',
-                    onTap: () => _showJobDetail(context, 'UI/UX Designer'),
+                    context: context,
+                    title: 'Career Tips for You',
+                    onSeeAll: () => _navigateToTips(context),
                   ),
                   const SizedBox(height: 16),
-                  _buildJobListing(
-                    company: 'Twitter',
-                    position: 'Financial Planner',
-                    location: 'United Kingdom',
-                    type: 'Part Time',
-                    salary: '\$2,200',
-                    logo: 'assets/twitter_logo.png',
-                    onTap: () => _showJobDetail(context, 'Financial Planner'),
+                  _buildTipCard(
+                    title: 'How to Ace Your Next Interview',
+                    content: 'Learn the top strategies to impress your interviewers',
+                    onTap: () => _showTipDetail(context, 'Interview Tips'),
                   ),
+                  const SizedBox(height: 32),
+
+                  // Job Category Tabs
+                  _buildCategoryTabs(widget.jobCategories, primaryColor),
+                  const SizedBox(height: 24),
+
+                  // Job Listings Section with Empty State
+                  _buildSectionHeader(
+                    context: context,
+                    title: 'Available Jobs',
+                    onSeeAll: () => _navigateToAllJobs(context),
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Empty State for Jobs
+                  _buildEmptyJobsState(),
                 ],
               ),
             ),
           ),
         ),
       ),
-      bottomNavigationBar:
-          _buildBottomNavigationBar(primaryColor, secondaryColor, context),
+      bottomNavigationBar: _buildBottomNavigationBar(primaryColor, secondaryColor, context),
+    );
+  }
+
+  // Empty state widget for jobs
+  Widget _buildEmptyJobsState() {
+    return Container(
+      padding: const EdgeInsets.all(32),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[200]!),
+      ),
+      child: Column(
+        children: [
+          Icon(
+            Icons.work_outline,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'No Job Opportunities Available',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: Colors.grey[600],
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'We\'re working hard to bring you the best job opportunities.\nCheck back soon for new openings!',
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.grey[500],
+              fontSize: 14,
+            ),
+          ),
+          const SizedBox(height: 24),
+          ElevatedButton.icon(
+            onPressed: () {
+              _showSearch(context);
+            },
+            icon: const Icon(Icons.search),
+            label: const Text('Search Job'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -175,21 +209,35 @@ const SizedBox(height: 32),
     Navigator.pushNamed(
       context,
       '/profile-creation',
-      arguments: jobCategories, // Pass current categories for editing
+      arguments: widget.jobCategories, // Pass current categories for editing
     );
   }
 
-  // Update the bottom navigation bar to include logout
+  // Update the bottom navigation bar to be functional
   Widget _buildBottomNavigationBar(
       Color primaryColor, Color secondaryColor, BuildContext context) {
     return BottomNavigationBar(
       type: BottomNavigationBarType.fixed,
       selectedItemColor: primaryColor,
       unselectedItemColor: secondaryColor,
+      currentIndex: _currentIndex,
       onTap: (index) {
-        if (index == 4) {
-          // Assuming we add a logout button as the 5th item
-          _logout(context);
+        setState(() {
+          _currentIndex = index;
+        });
+        
+        switch (index) {
+          case 0: // Home - already here
+            break;
+          case 1: // Search
+            _showSearch(context);
+            break;
+          case 2: // Saved
+            _showSavedJobs(context);
+            break;
+          case 3: // Profile
+            _navigateToProfile(context);
+            break;
         }
       },
       items: const [
@@ -209,11 +257,52 @@ const SizedBox(height: 32),
           icon: Icon(Icons.person_outline),
           label: 'Profile',
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.logout),
-          label: 'Logout',
-        ),
       ],
+    );
+  }
+
+  // Add saved jobs functionality
+  void _showSavedJobs(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Saved Jobs'),
+        content: Container(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Icons.bookmark_border,
+                size: 60,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No Saved Jobs Yet',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Jobs you save will appear here for easy access later.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
     );
   }
 
@@ -231,6 +320,7 @@ const SizedBox(height: 32),
         contentPadding: const EdgeInsets.symmetric(vertical: 16),
       ),
       onTap: () => _showSearch(context),
+      readOnly: true,
     );
   }
 
@@ -339,74 +429,46 @@ const SizedBox(height: 32),
     );
   }
 
-  Widget _buildJobListing({
-    required String company,
-    required String position,
-    required String location,
-    required String type,
-    required String salary,
-    required String logo,
-    required VoidCallback onTap,
-  }) {
-    return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(12),
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
+  void _showNotifications(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Notifications'),
+        content: Container(
+          width: double.maxFinite,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                leading: CircleAvatar(
-                  radius: 24,
-                  backgroundImage: AssetImage(logo),
+              Icon(
+                Icons.notifications_none,
+                size: 60,
+                color: Colors.grey[400],
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'No Notifications',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
                 ),
-                title: Text(
-                  position,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('$company • $location'),
-                    Text(type),
-                  ],
-                ),
-                trailing: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      salary,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                    const Text('/month'),
-                  ],
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'You\'ll receive notifications about job applications and updates here.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.grey[600],
                 ),
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  void _showNotifications(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>
-            const Placeholder(), // Replace with notifications screen
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
@@ -419,10 +481,17 @@ const SizedBox(height: 32),
   }
 
   void _navigateToTips(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Placeholder(), // Replace with tips screen
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Career Tips'),
+        content: const Text('More career tips and resources will be available here soon!'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
       ),
     );
   }
@@ -432,8 +501,7 @@ const SizedBox(height: 32),
       context: context,
       builder: (context) => AlertDialog(
         title: Text(tipTitle),
-        content:
-            const Text('Detailed content about this tip would appear here.'),
+        content: const Text('Detailed content about this tip would appear here.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -445,21 +513,11 @@ const SizedBox(height: 32),
   }
 
   void _navigateToAllJobs(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const Placeholder(), // Replace with jobs screen
-      ),
-    );
-  }
-
-  void _showJobDetail(BuildContext context, String jobTitle) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(jobTitle),
-        content: const Text(
-            'Detailed information about this job would appear here.'),
+        title: const Text('All Jobs'),
+        content: const Text('No jobs are currently available. We\'re constantly adding new opportunities, so please check back soon!'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
@@ -468,9 +526,9 @@ const SizedBox(height: 32),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              // Add apply logic here
+              _showSearch(context);
             },
-            child: const Text('Apply'),
+            child: const Text('Set Alert'),
           ),
         ],
       ),
@@ -503,15 +561,69 @@ class CustomSearchDelegate extends SearchDelegate<String> {
 
   @override
   Widget buildResults(BuildContext context) {
-    return Center(
-      child: Text('Search results for: $query'),
+    if (query.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.search,
+              size: 80,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 16),
+            Text(
+              'No jobs available yet',
+              style: TextStyle(
+                fontSize: 18,
+                color: Colors.grey,
+              ),
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Jobs will appear here once they are posted',
+              style: TextStyle(
+                color: Colors.grey,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    
+    return const Center(
+      child: Text('No search results found. No jobs have been posted yet.'),
     );
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    return Center(
-      child: Text('Suggestions for: $query'),
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.search,
+            size: 80,
+            color: Colors.grey,
+          ),
+          SizedBox(height: 16),
+          Text(
+            'Search for jobs',
+            style: TextStyle(
+              fontSize: 18,
+              color: Colors.grey,
+            ),
+          ),
+          SizedBox(height: 8),
+          Text(
+            'No jobs available to search yet',
+            style: TextStyle(
+              color: Colors.grey,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
