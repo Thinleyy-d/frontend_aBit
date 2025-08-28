@@ -220,14 +220,22 @@ class GaweanJobPortal extends StatelessWidget {
           ),
         );
       
-      // New dynamic routes for vacancy creation flo
+      // New dynamic routes for vacancy creation flow
       case '/requirements_selection':
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
         return MaterialPageRoute(
-          builder: (_) => const RequirementsSelectionScreen(),
+          builder: (_) => RequirementsSelectionScreen(
+            jobData: args['jobData'] ?? {},
+            requirements: args['requirements'] ?? [],
+          ),
         );
       case '/job_posted':
+        final args = settings.arguments as Map<String, dynamic>? ?? {};
         return MaterialPageRoute(
-          builder: (_) => const JobVacancyPostedScreen(),
+          builder: (_) => JobVacancyPostedScreen(
+            jobData: args['jobData'] ?? {},
+            requirements: args['requirements'] ?? [],
+          ),
         );
         
       default:
@@ -239,27 +247,5 @@ class GaweanJobPortal extends StatelessWidget {
           ),
         );
     }
-  }
-}
-
-// Requirement Model (should be in a separate file, but added here for completeness)
-class Requirement {
-  final String text;
-  bool isChecked;
-
-  Requirement({required this.text, required this.isChecked});
-
-  Map<String, dynamic> toMap() {
-    return {
-      'text': text,
-      'isChecked': isChecked,
-    };
-  }
-
-  factory Requirement.fromMap(Map<String, dynamic> map) {
-    return Requirement(
-      text: map['text'] ?? '',
-      isChecked: map['isChecked'] ?? false,
-    );
   }
 }

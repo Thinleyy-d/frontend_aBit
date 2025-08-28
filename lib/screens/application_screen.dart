@@ -30,7 +30,7 @@ class ApplicationsScreen extends StatelessWidget {
             image: AssetImage('assets/minimalist_bg.png'), // Your minimalist background image
             fit: BoxFit.cover,
             colorFilter: ColorFilter.mode(
-              Colors.white.withOpacity(0.95), // Light overlay to maintain readability
+              Colors.white, // Light overlay to maintain readability
               BlendMode.dstOver,
             ),
           ),

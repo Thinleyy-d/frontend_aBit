@@ -2,7 +2,14 @@ import 'package:flutter/material.dart';
 import '../models/requirement.dart';
 
 class RequirementsSelectionScreen extends StatefulWidget {
-  const RequirementsSelectionScreen({super.key});
+  final Map<String, dynamic> jobData;
+  final List<dynamic> requirements;
+
+  const RequirementsSelectionScreen({
+    super.key,
+    required this.jobData,
+    required this.requirements,
+  });
 
   @override
   State<RequirementsSelectionScreen> createState() => _RequirementsSelectionScreenState();
@@ -15,21 +22,24 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
   @override
   void initState() {
     super.initState();
-    _requirements = [];
-    _jobData = {};
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    if (args != null) {
-      _requirements = List<Requirement>.from(args['requirements'] ?? []);
-      _jobData = Map<String, dynamic>.from(args['jobData'] ?? {});
-      
-      if (_requirements.length >= 2) _requirements[1].isChecked = true;
-      if (_requirements.length >= 4) _requirements[3].isChecked = true;
-      if (_requirements.length >= 5) _requirements[4].isChecked = true;
+    _jobData = widget.jobData;
+    
+    // Convert dynamic list to Requirement objects
+    if (widget.requirements.isNotEmpty && widget.requirements.first is Map) {
+      _requirements = widget.requirements.map((item) => 
+        Requirement.fromMap(Map<String, dynamic>.from(item))
+      ).toList();
+    } else if (widget.requirements.isNotEmpty && widget.requirements.first is Requirement) {
+      _requirements = List<Requirement>.from(widget.requirements);
+    } else {
+      // Default requirements if none provided
+      _requirements = [
+        Requirement(text: "Minimum 3 years of experience", isChecked: false),
+        Requirement(text: "Bachelor's degree in related field", isChecked: true),
+        Requirement(text: "Portfolio of previous work", isChecked: false),
+        Requirement(text: "Good communication skills", isChecked: true),
+        Requirement(text: "Ability to work in a team", isChecked: true),
+      ];
     }
   }
 
@@ -37,11 +47,17 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Vacancies'),
+        title: const Text('Requirements'),
         centerTitle: true,
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
@@ -49,10 +65,18 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Requirements',
+              'Select Requirements',
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Choose the requirements that applicants must meet',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.grey,
               ),
             ),
             const SizedBox(height: 24),
@@ -77,7 +101,7 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
                   color: Color(0xFF4C7DFF),
                 ),
                 label: const Text(
-                  'Add New Requirements',
+                  'Add New Requirement',
                   style: TextStyle(
                     color: Color(0xFF4C7DFF),
                     fontWeight: FontWeight.bold,
@@ -113,7 +137,7 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF4C7DFF),
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  minimumSize: const Size(double.infinity, 50),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -128,16 +152,22 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
   }
 
   Widget _buildRequirementItem(Requirement requirement, int index) {
-    return CheckboxListTile(
-      title: Text(requirement.text),
-      value: requirement.isChecked,
-      onChanged: (value) {
-        setState(() {
-          _requirements[index].isChecked = value ?? false;
-        });
-      },
-      controlAffinity: ListTileControlAffinity.leading,
-      contentPadding: EdgeInsets.zero,
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      child: CheckboxListTile(
+        title: Text(
+          requirement.text,
+          style: const TextStyle(fontSize: 16),
+        ),
+        value: requirement.isChecked,
+        onChanged: (value) {
+          setState(() {
+            _requirements[index].isChecked = value ?? false;
+          });
+        },
+        controlAffinity: ListTileControlAffinity.leading,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
     );
   }
 
@@ -150,28 +180,24 @@ class _RequirementsSelectionScreenState extends State<RequirementsSelectionScree
         title: const Text('Add New Requirement'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(hintText: 'Enter requirement...'),
+          decoration: const InputDecoration(
+            hintText: 'Enter requirement...',
+            border: OutlineInputBorder(),
+          ),
           autofocus: true,
-          onSubmitted: (value) {
-            if (value.isNotEmpty) {
-              setState(() {
-                _requirements.add(Requirement(text: value, isChecked: false));
-              });
-              Navigator.pop(context);
-            }
-          },
+          maxLines: 2,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               final text = controller.text.trim();
               if (text.isNotEmpty) {
                 setState(() {
-                  _requirements.add(Requirement(text: text, isChecked: false));
+                  _requirements.add(Requirement(text: text, isChecked: true));
                 });
                 Navigator.pop(context);
               }

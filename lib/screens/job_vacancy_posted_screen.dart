@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import '../models/requirement.dart';
 
 class JobVacancyPostedScreen extends StatelessWidget {
-  const JobVacancyPostedScreen({super.key});
+  final Map<String, dynamic> jobData;
+  final List<Requirement> requirements;
+
+  const JobVacancyPostedScreen({
+    super.key,
+    required this.jobData,
+    required this.requirements,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final jobData = args?['jobData'] ?? {};
-    final requirements = args?['requirements'] ?? [];
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -20,7 +23,7 @@ class JobVacancyPostedScreen extends StatelessWidget {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -33,21 +36,118 @@ class JobVacancyPostedScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            Text(
-              '• ${jobData['position'] ?? 'UI/UX Designer'}\n  ${jobData['company'] ?? 'AirBNB'}',
-              style: const TextStyle(fontSize: 16),
+            
+            // Job Position and Company
+            _buildDetailItem(
+              icon: Icons.work_outline,
+              title: 'Position',
+              value: jobData['position'] ?? 'Not specified',
             ),
+            _buildDetailItem(
+              icon: Icons.business,
+              title: 'Company',
+              value: jobData['company'] ?? 'Not specified',
+            ),
+            
+            // Location
+            if (jobData['location'] != null && jobData['location'].toString().isNotEmpty)
+              _buildDetailItem(
+                icon: Icons.location_on_outlined,
+                title: 'Location',
+                value: jobData['location'],
+              ),
+            
+            // Employment Type
+            if (jobData['employmentType'] != null && jobData['employmentType'].toString().isNotEmpty)
+              _buildDetailItem(
+                icon: Icons.access_time,
+                title: 'Employment Type',
+                value: jobData['employmentType'],
+              ),
+            
+            // Salary
+            if (jobData['salary'] != null && jobData['salary'].toString().isNotEmpty)
+              _buildDetailItem(
+                icon: Icons.attach_money,
+                title: 'Salary',
+                value: jobData['salary'],
+              ),
+            
+            // Job Description
+            if (jobData['description'] != null && jobData['description'].toString().isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Job Description',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    jobData['description'],
+                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                ],
+              ),
+            
+            // Requirements Section
+            if (requirements.isNotEmpty)
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Requirements',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  ...requirements.map((requirement) => Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4.0),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text('• ', style: TextStyle(fontSize: 16)),
+                        Expanded(
+                          child: Text(
+                            requirement.text,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ),
+                      ],
+                    ),
+                  )).toList(),
+                ],
+              ),
+            
             const SizedBox(height: 24),
             const Divider(),
             const SizedBox(height: 24),
             
+            // Success Message
             const Center(
-              child: Text(
-                'Job Vacancy Posted!',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Column(
+                children: [
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.green,
+                    size: 64,
+                  ),
+                  SizedBox(height: 16),
+                  Text(
+                    'Job Vacancy Posted!',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
             const SizedBox(height: 16),
@@ -58,6 +158,7 @@ class JobVacancyPostedScreen extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             
+            // Action Buttons
             ElevatedButton(
               onPressed: () {
                 Navigator.pushNamedAndRemoveUntil(
@@ -100,6 +201,41 @@ class JobVacancyPostedScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDetailItem({required IconData icon, required String title, required String value}) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, size: 20, color: Colors.grey[700]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey[600],
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
