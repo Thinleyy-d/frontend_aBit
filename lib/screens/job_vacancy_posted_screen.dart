@@ -3,7 +3,7 @@ import '../models/requirement.dart';
 
 class JobVacancyPostedScreen extends StatelessWidget {
   final Map<String, dynamic> jobData;
-  final List<Requirement> requirements;
+  final List<dynamic> requirements;
 
   const JobVacancyPostedScreen({
     super.key,
@@ -13,6 +13,16 @@ class JobVacancyPostedScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Convert dynamic list to Requirement objects
+    List<Requirement> requirementList = [];
+    if (requirements.isNotEmpty && requirements.first is Map) {
+      requirementList = requirements.map((item) => 
+        Requirement.fromMap(Map<String, dynamic>.from(item))
+      ).toList();
+    } else if (requirements.isNotEmpty && requirements.first is Requirement) {
+      requirementList = List<Requirement>.from(requirements);
+    }
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -35,95 +45,158 @@ class JobVacancyPostedScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 24),
             
-            // Job Position and Company
-            _buildDetailItem(
-              icon: Icons.work_outline,
-              title: 'Position',
-              value: jobData['position'] ?? 'Not specified',
-            ),
-            _buildDetailItem(
-              icon: Icons.business,
-              title: 'Company',
-              value: jobData['company'] ?? 'Not specified',
-            ),
-            
-            // Location
-            if (jobData['location'] != null && jobData['location'].toString().isNotEmpty)
-              _buildDetailItem(
-                icon: Icons.location_on_outlined,
-                title: 'Location',
-                value: jobData['location'],
-              ),
-            
-            // Employment Type
-            if (jobData['employmentType'] != null && jobData['employmentType'].toString().isNotEmpty)
-              _buildDetailItem(
-                icon: Icons.access_time,
-                title: 'Employment Type',
-                value: jobData['employmentType'],
-              ),
-            
-            // Salary
-            if (jobData['salary'] != null && jobData['salary'].toString().isNotEmpty)
-              _buildDetailItem(
-                icon: Icons.attach_money,
-                title: 'Salary',
-                value: jobData['salary'],
-              ),
-            
-            // Job Description
-            if (jobData['description'] != null && jobData['description'].toString().isNotEmpty)
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Job Description',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    jobData['description'],
-                    style: const TextStyle(fontSize: 16, color: Colors.black87),
+            // Horizontal Job Details Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(0.1),
+                    spreadRadius: 2,
+                    blurRadius: 8,
+                    offset: const Offset(0, 3),
                   ),
                 ],
               ),
-            
-            // Requirements Section
-            if (requirements.isNotEmpty)
-              Column(
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Requirements',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  // Position and Company in a row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildHorizontalDetailItem(
+                          icon: Icons.work_outline,
+                          title: 'Position',
+                          value: jobData['position'] ?? 'Not specified',
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildHorizontalDetailItem(
+                          icon: Icons.business,
+                          title: 'Company',
+                          value: jobData['company'] ?? 'Not specified',
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 8),
-                  ...requirements.map((requirement) => Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 4.0),
-                    child: Row(
+                  const SizedBox(height: 16),
+                  
+                  // Location and Employment Type in a row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildHorizontalDetailItem(
+                          icon: Icons.location_on_outlined,
+                          title: 'Location',
+                          value: jobData['location'] ?? 'Not specified',
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: _buildHorizontalDetailItem(
+                          icon: Icons.access_time,
+                          title: 'Employment Type',
+                          value: jobData['employmentType'] ?? 'Not specified',
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  
+                  // Salary (full width)
+                  _buildHorizontalDetailItem(
+                    icon: Icons.attach_money,
+                    title: 'Salary',
+                    value: jobData['salary'] ?? 'Not specified',
+                  ),
+                  
+                  // Job Description
+                  if (jobData['description'] != null && jobData['description'].toString().isNotEmpty)
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('• ', style: TextStyle(fontSize: 16)),
-                        Expanded(
-                          child: Text(
-                            requirement.text,
-                            style: const TextStyle(fontSize: 16),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Job Description',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          jobData['description'],
+                          style: const TextStyle(fontSize: 16, color: Colors.black87),
                         ),
                       ],
                     ),
-                  )).toList(),
                 ],
+              ),
+            ),
+            
+            const SizedBox(height: 24),
+            
+            // Requirements Section - FIXED
+            if (requirementList.isNotEmpty)
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.1),
+                      spreadRadius: 2,
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Requirements',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    // Fixed requirements layout using Wrap
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 12,
+                      children: requirementList.map((requirement) => SizedBox(
+                        width: (MediaQuery.of(context).size.width - 88) / 2,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text('• ', 
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                            Expanded(
+                              child: Text(
+                                requirement.text,
+                                style: const TextStyle(fontSize: 16),
+                                softWrap: true,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )).toList(),
+                    ),
+                  ],
+                ),
               ),
             
             const SizedBox(height: 24),
@@ -205,38 +278,32 @@ class JobVacancyPostedScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailItem({required IconData icon, required String title, required String value}) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, size: 20, color: Colors.grey[700]),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey[600],
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
+  Widget _buildHorizontalDetailItem({required IconData icon, required String title, required String value}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 20, color: Colors.grey[700]),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
             ),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(
+          value,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
